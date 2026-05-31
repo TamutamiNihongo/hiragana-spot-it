@@ -493,30 +493,41 @@ function showCard(elId, charIndices){
 
 function selectChar(idx){
   if(G.awarded) return;
-  if(idx !== G.commonIdx) return; // กดผิด: ไม่ทำอะไร
   G.awarded = true;
-  G.selectedChar = idx;
-  openAnswerPopup();
+  const correct = (idx === G.commonIdx);
+  G.selectedChar = G.commonIdx; // โชว์เฉลยที่ถูกต้องเสมอ (ทั้งกดถูกและกดผิด)
+  openAnswerPopup(correct);
 }
 
-// เปิดป๊อปอัพเฉลย + เสียงญี่ปุ่น + ปุ่มเลือกผู้เล่นที่ได้คะแนน
-function openAnswerPopup(){
+// เปิดป๊อปอัพเฉลย + เสียงญี่ปุ่น
+// correct = true  -> มีปุ่มเลือกผู้เล่นให้คะแนน
+// correct = false -> กดผิด: โชว์เฉลยอย่างเดียว ไม่ให้คะแนน (มีแค่ปุ่มข้าม)
+function openAnswerPopup(correct){
   const h = HIRAGANA_DATA[G.selectedChar];
   document.getElementById('answerImg').src = getHiraganaPath(h.file);
   document.getElementById('answerReading').textContent = h.char + ' (' + h.romaji + ')';
   speakChar(h.char);
   const wrap = document.getElementById('answerPlayers');
+  const confirmBtn = document.getElementById('answerConfirm');
+  const prompt = document.getElementById('answerPrompt');
   wrap.innerHTML = '';
-  for(let i=0;i<G.players;i++){
-    const b = document.createElement('button');
-    b.className = 'answer-pbtn';
-    b.dataset.idx = i;
-    b.style.background = PLAYER_COLORS[i];
-    b.textContent = 'P' + (i+1);
-    b.onclick = () => togglePlayer(b);
-    wrap.appendChild(b);
+  if(correct){
+    prompt.textContent = (LANG=='th'?'ใครตอบถูก? แตะเลือกได้หลายคน':'Who got it? Tap all that apply');
+    for(let i=0;i<G.players;i++){
+      const b = document.createElement('button');
+      b.className = 'answer-pbtn';
+      b.dataset.idx = i;
+      b.style.background = PLAYER_COLORS[i];
+      b.textContent = 'P' + (i+1);
+      b.onclick = () => togglePlayer(b);
+      wrap.appendChild(b);
+    }
+    confirmBtn.style.display = '';
+    updateConfirmLabel();
+  } else {
+    prompt.textContent = (LANG=='th'?'ตอบผิด 😅 เฉลยที่ถูกคือ':'Wrong 😅 The answer is');
+    confirmBtn.style.display = 'none';
   }
-  updateConfirmLabel();
   document.getElementById('answerPopup').classList.add('show');
 }
 
