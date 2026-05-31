@@ -56,11 +56,13 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none;touch-action:
 .p1{border-top:6px solid var(--hotpink)}.p2{border-top:6px solid var(--teal)}.p3{border-top:6px solid var(--orange)}.p4{border-top:6px solid var(--purple)}
 .cards-area{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:nowrap;height:100%}
 @media(max-width:600px){.cards-area{gap:10px;padding:4px 0}}
-.card-img{width:min(38vw,400px);min-height:min(38vw,200px);background:#fff;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.2);overflow:auto;flex-shrink:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(70px,1fr));gap:8px;padding:12px;align-content:start;transition:transform .3s}
-@media(max-width:900px){.card-img{width:min(36vw,360px);height:min(36vw,360px)}}
-@media(max-width:600px){.card-img{width:min(43vw,200px);min-height:min(43vw,150px)}}
-.card-img img{width:100%;height:100%;object-fit:contain;pointer-events:none;display:none}
-.card-char img{width:100%;height:100%;object-fit:contain;border-radius:8px;transition:0.2s}
+.card-img{width:min(42vw,300px);background:#fff;border-radius:18px;box-shadow:0 8px 24px rgba(0,0,0,.2);overflow:hidden;flex-shrink:0;display:grid;grid-template-columns:repeat(2,1fr);gap:6px;padding:10px;align-content:center;transition:transform .3s}
+@media(max-width:900px){.card-img{width:min(42vw,260px)}}
+@media(max-width:600px){.card-img{width:min(46vw,220px);border-radius:14px;padding:8px;gap:5px}}
+.card-char{cursor:pointer;border-radius:10px;padding:4px;transition:transform .12s,background .12s;-webkit-tap-highlight-color:transparent}
+.card-char:hover{background:#FFE5EE;transform:scale(1.06)}
+.card-char:active{transform:scale(.92)}
+.card-char img{display:block;width:100%;aspect-ratio:1;object-fit:contain;pointer-events:none}
 .card-img.dealing{animation:cardDeal .5s ease-out}
 @keyframes cardDeal{0%{transform:scale(.6) rotate(-15deg);opacity:0}100%{transform:scale(1) rotate(0);opacity:1}}
 .feedback{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:clamp(36px,8vw,80px);font-weight:900;color:#fff;text-shadow:4px 4px 0 var(--hotpink),0 0 20px rgba(0,0,0,.3);pointer-events:none;opacity:0;z-index:100}
@@ -133,7 +135,7 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none;touch-action:
 </div>
 <div class="rounds-input">
 <label data-th="จำนวนรอบ" data-en="Number of Rounds">จำนวนรอบ</label>
-<input type="number" id="roundsInput" value="46" min="5" max="57">
+<input type="number" id="roundsInput" value="46" min="5" max="46">
 </div>
 <button class="start-btn" onclick="startGame()" data-th="เริ่มเล่น!" data-en="Start!">เริ่มเล่น!</button>
 </div>
@@ -144,7 +146,7 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none;touch-action:
 <button class="back-btn" style="position:static;margin:0" onclick="confirmExit()">← Menu</button>
 <h2>🎴 SPOT IT! Hiragana</h2>
 <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-<div class="round-info"><span data-th="รอบ" data-en="Round">รอบ</span> <span id="roundNum">1</span>/<span id="totalRounds">27</span></div>
+<div class="round-info"><span data-th="รอบ" data-en="Round">รอบ</span> <span id="roundNum">1</span>/<span id="totalRounds">46</span></div>
 <button class="next-btn" onclick="nextRound()" data-th="ถัดไป ▶" data-en="Next ▶">ถัดไป ▶</button>
 <button class="icon-btn" onclick="resetScores()" title="Reset">↺</button>
 </div>
@@ -161,14 +163,14 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none;touch-action:
 <button class="back-btn" onclick="show('titleScreen')">← Back</button>
 <div class="panel">
 <h2 data-th="กติกาการเล่น" data-en="How to Play">กติกาการเล่น</h2>
-<p>🎴 <span class="accent">การ์ด 57 ใบ</span> ใบละ <span class="accent">8 รูป</span> ทุกคู่จะมีตัวที่เหมือนกัน <span class="accent">1 ตัว</span></p>
+<p>🎴 <span class="accent">การ์ด 46 ใบ</span> ใบละ <span class="accent">8 ตัวอักษร</span> ทุกคู่จะมีตัวที่เหมือนกัน <span class="accent">1 ตัว</span></p>
 <h3 style="color:var(--orange);margin-top:20px;font-size:24px" data-th="วิธีเล่น" data-en="How to Play">วิธีเล่น</h3>
 <ol>
 <li data-th="คลิก ▶ เริ่มเกม แล้วเลือกจำนวนผู้เล่น (1-4 คน)" data-en="Click ▶ Play and choose 1-4 players.">คลิก ▶ เริ่มเกม แล้วเลือกจำนวนผู้เล่น (1-4 คน)</li>
 <li data-th="การ์ด 2 ใบจะปรากฏขึ้นพร้อมกัน" data-en="Two cards appear on the screen.">การ์ด 2 ใบจะปรากฏขึ้นพร้อมกัน</li>
-<li data-th="ผู้เล่นทุกคนแข่งกันหา <span class='accent'>ตัวอักษรที่เหมือนกัน</span> ที่ปรากฏบนการ์ดทั้งสองใบ" data-en="Players race to find the matching symbol on both cards.">ผู้เล่นแข่งกันหาตัวอักษรที่เหมือนกัน</li>
-<li data-th="ใครหาเจอก่อนให้กดปุ่ม P1, P2, P3 หรือ P4 ของตัวเอง <span class='accent'>+1 คะแนน</span>" data-en="Whoever finds it first taps their P1-P4 button: +1 point.">ใครเจอก่อนกดปุ่ม P1-P4 ของตัวเอง +1 คะแนน</li>
-<li data-th="กดปุ่ม <span class='accent'>ถัดไป ▶</span> เพื่อไปการ์ดคู่ใหม่" data-en="Click <span class='accent'>Next ▶</span> for a new pair.">กดปุ่ม ถัดไป ▶ เพื่อไปคู่ใหม่</li>
+<li data-th="หา <span class='accent'>ตัวอักษรที่เหมือนกัน</span> บนการ์ดทั้งสองใบ แล้ว <span class='accent'>ออกเสียงตัวนั้นดัง ๆ</span>" data-en="Find the matching character on both cards, then say it out loud.">หาตัวอักษรที่เหมือนกัน แล้วออกเสียงดัง ๆ</li>
+<li data-th="(ผู้เล่นหลายคน) แตะที่ <span class='accent'>ป้ายผู้เล่นของตัวเอง</span> ก่อน เพื่อเลือกว่าใครเป็นคนตอบ" data-en="(Multiplayer) Tap your player panel first to choose who answers.">หลายคน: แตะป้ายผู้เล่นของตัวเองก่อน</li>
+<li data-th="แตะที่ <span class='accent'>ตัวอักษรที่เหมือนกัน</span> บนการ์ด ถ้าถูกจะ <span class='accent'>+1 คะแนน</span> พร้อมเสียงอ่านโรมาจิ" data-en="Tap the matching character. Correct = +1 point with romaji audio.">แตะตัวอักษรที่เหมือนกัน ถูก = +1 พร้อมเสียงอ่าน</li>
 <li data-th="เกมจบเมื่อครบรอบ ใครคะแนนสูงสุดชนะ! 🏆" data-en="The game ends when rounds run out. Highest score wins! 🏆">เกมจบเมื่อครบรอบ ใครคะแนนสูงสุดชนะ! 🏆</li>
 </ol>
 <h3 style="color:var(--teal);margin-top:20px;font-size:24px" data-th="ประโยชน์" data-en="Benefits">ประโยชน์</h3>
@@ -258,8 +260,15 @@ const HIRAGANA_DATA = [
   {n:46, char:'ん', romaji:'n', file:'46-n.png'}
 ];
 
+const TOTAL_CARDS = 46;
+
+let G = {players:2, rounds:46, current:0, scores:[0,0,0,0], active:0, cardA:null, cardB:null, awarded:false, commonIdx:null, selectedChar:null};
+let LANG = 'th';
+let flashIdx = 0;
+
 // Speech Synthesis
 function speakRomaji(romaji){
+  if(!('speechSynthesis' in window)) return;
   const utterance = new SpeechSynthesisUtterance(romaji);
   utterance.lang = 'ja-JP';
   utterance.rate = 0.8;
@@ -271,6 +280,211 @@ function speakRomaji(romaji){
 function getHiraganaPath(file){
   return 'Hiragana a-n/'+encodeURIComponent(file);
 }
+
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function goSetup(){ show('setupScreen'); }
+function exitGame(){ if(confirm(LANG=='th'?'ออกจากเกม?':'Exit game?')) window.close(); }
+function confirmExit(){ if(confirm(LANG=='th'?'ออกไปยังหน้าหลัก?':'Return to main menu?')) show('titleScreen'); }
+
+function toggleLang(){
+  LANG = LANG==='th'?'en':'th';
+  document.getElementById('langBtn').textContent = LANG==='th'?'EN':'TH';
+  document.querySelectorAll('[data-th]').forEach(el=>{
+    el.innerHTML = el.dataset[LANG] || el.textContent;
+  });
+}
+
+function setPlayers(n){
+  G.players = n;
+  document.querySelectorAll('.pc-opt').forEach(el=>{ el.classList.toggle('selected', parseInt(el.dataset.count)===n); });
+}
+
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]]; }
+  return arr;
+}
+
+function startGame(){
+  G.rounds = Math.max(5, Math.min(46, parseInt(document.getElementById('roundsInput').value)||46));
+  G.current = 0; G.scores = [0,0,0,0]; G.active = 0;
+  G.cardA = null; G.cardB = null; G.awarded = false;
+  document.getElementById('totalRounds').textContent = G.rounds;
+  buildPlayerPanels();
+  show('gameScreen');
+  requestAnimationFrame(()=> requestAnimationFrame(nextRound));
+}
+
+function buildPlayerPanels(){
+  const left = document.getElementById('leftPlayers');
+  const right = document.getElementById('rightPlayers');
+  left.innerHTML=''; right.innerHTML='';
+  const slots = [{idx:0,side:'left',cls:'p1',name:'P1'},{idx:1,side:'right',cls:'p2',name:'P2'},{idx:2,side:'left',cls:'p3',name:'P3'},{idx:3,side:'right',cls:'p4',name:'P4'}];
+  for(let s of slots){
+    if(s.idx>=G.players) continue;
+    const div = document.createElement('div');
+    div.className = 'player '+s.cls + (s.idx===G.active?' active':'');
+    div.dataset.idx = s.idx;
+    div.id = 'player'+s.idx;
+    div.innerHTML = '<div class="player-name">'+s.name+'</div><div class="player-score" id="score'+s.idx+'">'+G.scores[s.idx]+'</div>';
+    div.onclick = ()=>setActivePlayer(s.idx);
+    (s.side==='left'?left:right).appendChild(div);
+  }
+}
+
+function setActivePlayer(i){
+  G.active = i;
+  document.querySelectorAll('.player').forEach(p=>p.classList.toggle('active', parseInt(p.dataset.idx)===i));
+}
+
+function generateCardPair(){
+  const cardA = [];
+  while(cardA.length < 8){
+    const idx = Math.floor(Math.random() * TOTAL_CARDS);
+    if(!cardA.includes(idx)) cardA.push(idx);
+  }
+  const common = cardA[Math.floor(Math.random() * 8)];
+  const cardB = [common];
+  const remaining = [];
+  for(let i=0;i<TOTAL_CARDS;i++) if(!cardA.includes(i)) remaining.push(i);
+  shuffle(remaining);
+  while(cardB.length < 8){ cardB.push(remaining.pop()); }
+  shuffle(cardB);
+  G.commonIdx = common;
+  return [cardA, cardB];
+}
+
+function nextRound(){
+  if(G.current >= G.rounds){ endGame(); return; }
+  G.current++;
+  document.getElementById('roundNum').textContent = G.current;
+  G.awarded = false;
+  G.selectedChar = null;
+  // reset next button label
+  const nextBtn = document.querySelector('.next-btn');
+  nextBtn.textContent = (LANG=='th'?'ข้าม ▶':'Skip ▶');
+  nextBtn.onclick = nextRound;
+
+  const [cardA, cardB] = generateCardPair();
+  G.cardA = cardA;
+  G.cardB = cardB;
+  showCard('card1', cardA);
+  showCard('card2', cardB);
+}
+
+function showCard(elId, charIndices){
+  const el = document.getElementById(elId);
+  el.innerHTML = '';
+  charIndices.forEach((idx, pos) => {
+    const h = HIRAGANA_DATA[idx];
+    const div = document.createElement('div');
+    div.className = 'card-char';
+    div.dataset.idx = idx;
+    div.innerHTML = '<img src="'+getHiraganaPath(h.file)+'" alt="'+h.char+'">';
+    div.onclick = () => selectChar(idx);
+    el.appendChild(div);
+  });
+  el.classList.remove('dealing');
+  void el.offsetWidth;
+  el.classList.add('dealing');
+}
+
+function selectChar(idx){
+  if(G.awarded) return;
+  if(idx !== G.commonIdx) return; // กดผิด: ไม่ทำอะไร
+  G.awarded = true;
+  G.selectedChar = idx;
+  awardPoint(G.active);
+}
+
+function awardPoint(i){
+  G.scores[i]++;
+  document.getElementById('score'+i).textContent = G.scores[i];
+  const pl = document.getElementById('player'+i);
+  if(pl){ pl.classList.remove('flash'); void pl.offsetWidth; pl.classList.add('flash'); }
+
+  const h = HIRAGANA_DATA[G.selectedChar];
+  flashFeedback((LANG=='th'?'+1 ให้ P':'+1 to P')+(i+1)+' — '+h.char+' ('+h.romaji+') ✨');
+  speakRomaji(h.romaji);
+
+  const nextBtn = document.querySelector('.next-btn');
+  nextBtn.textContent = (LANG=='th'?'ถัดไป ▶':'Next ▶');
+  nextBtn.onclick = nextRound;
+  setTimeout(()=>nextRound(), 1600);
+}
+
+function flashFeedback(text){
+  const fb = document.getElementById('feedback');
+  fb.textContent = text;
+  fb.classList.remove('show');
+  void fb.offsetWidth;
+  fb.classList.add('show');
+}
+
+function resetScores(){
+  if(!confirm(LANG=='th'?'รีเซ็ตคะแนน?':'Reset scores?')) return;
+  G.scores=[0,0,0,0];
+  for(let i=0;i<4;i++){ const el=document.getElementById('score'+i); if(el) el.textContent='0'; }
+  G.current=0; nextRound();
+}
+
+function endGame(){
+  const board = document.getElementById('finalScoreboard');
+  board.innerHTML='';
+  const max = Math.max(...G.scores.slice(0,G.players));
+  for(let i=0;i<G.players;i++){
+    const div = document.createElement('div');
+    div.className = 'score-row' + (G.scores[i]===max && max>0?' winner':'');
+    div.innerHTML = '<div>P'+(i+1)+'</div><div style="font-size:36px;color:var(--hotpink)">'+G.scores[i]+'</div>';
+    board.appendChild(div);
+  }
+  const winners=[];
+  for(let i=0;i<G.players;i++) if(G.scores[i]===max && max>0) winners.push('P'+(i+1));
+  document.getElementById('winnerLine').textContent =
+    winners.length===0 ? (LANG=='th'?'ไม่มีผู้ชนะ':'No winner') :
+    winners.length===1 ? (LANG=='th'?winners[0]+' ชนะ! 🎉':winners[0]+' wins! 🎉') :
+    (LANG=='th'?'เสมอ: '+winners.join(', '):'Tie: '+winners.join(', '));
+  show('endScreen');
+}
+
+function openFlashIndex(){
+  const grid = document.getElementById('flashGrid');
+  if(!grid.children.length){
+    HIRAGANA_DATA.forEach((h, i) => {
+      const t = document.createElement('div');
+      t.className = 'flash-tile';
+      t.innerHTML = '<img src="'+getHiraganaPath(h.file)+'"><div class="label">'+h.char+' ('+h.romaji+')</div>';
+      t.onclick = ()=>showFlash(i);
+      grid.appendChild(t);
+    });
+  }
+  show('flashScreen');
+}
+function showFlash(i){
+  flashIdx = i;
+  const h = HIRAGANA_DATA[i];
+  document.getElementById('flashImg').src = getHiraganaPath(h.file);
+  document.getElementById('flashRomaji').textContent = h.char+' ('+h.romaji+')';
+  document.getElementById('flashViewer').classList.add('show');
+  setTimeout(()=>speakRomaji(h.romaji), 300);
+}
+function flashPrev(){ flashIdx=(flashIdx-1+HIRAGANA_DATA.length)%HIRAGANA_DATA.length; showFlash(flashIdx); }
+function flashNext(){ flashIdx=(flashIdx+1)%HIRAGANA_DATA.length; showFlash(flashIdx); }
+function closeFlash(){ document.getElementById('flashViewer').classList.remove('show'); }
+
+document.addEventListener('keydown', e=>{
+  if(document.getElementById('flashViewer').classList.contains('show')){
+    if(e.key==='ArrowLeft') flashPrev();
+    if(e.key==='ArrowRight') flashNext();
+    if(e.key==='Escape') closeFlash();
+    return;
+  }
+  if(document.getElementById('gameScreen').classList.contains('active')){
+    if(e.key==='Enter' || e.key===' '){ e.preventDefault(); nextRound(); }
+  }
+});
 
 LANG='th';
 document.getElementById('langBtn').textContent = 'EN';
