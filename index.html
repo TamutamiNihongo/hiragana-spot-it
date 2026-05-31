@@ -56,12 +56,11 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none;touch-action:
 .p1{border-top:6px solid var(--hotpink)}.p2{border-top:6px solid var(--teal)}.p3{border-top:6px solid var(--orange)}.p4{border-top:6px solid var(--purple)}
 .cards-area{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:nowrap;height:100%}
 @media(max-width:600px){.cards-area{gap:10px;padding:4px 0}}
-.card-img{width:min(42vw,300px);background:#fff;border-radius:18px;box-shadow:0 8px 24px rgba(0,0,0,.2);overflow:hidden;flex-shrink:0;display:grid;grid-template-columns:repeat(2,1fr);gap:6px;padding:10px;align-content:center;transition:transform .3s}
+.card-img{width:min(40vw,300px);aspect-ratio:1;background:#fff;border-radius:50%;box-shadow:0 8px 24px rgba(0,0,0,.2);flex-shrink:0;position:relative;overflow:hidden;transition:transform .3s}
 @media(max-width:900px){.card-img{width:min(42vw,260px)}}
-@media(max-width:600px){.card-img{width:min(46vw,220px);border-radius:14px;padding:8px;gap:5px}}
-.card-char{cursor:pointer;border-radius:10px;padding:4px;transition:transform .12s,background .12s;-webkit-tap-highlight-color:transparent}
-.card-char:hover{background:#FFE5EE;transform:scale(1.06)}
-.card-char:active{transform:scale(.92)}
+@media(max-width:600px){.card-img{width:min(46vw,200px)}}
+.card-char{position:absolute;width:27%;transform:translate(-50%,-50%) rotate(var(--rot,0deg));cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .12s}
+.card-char:active{transform:translate(-50%,-50%) scale(.82) rotate(var(--rot,0deg))}
 .card-char img{display:block;width:100%;aspect-ratio:1;object-fit:contain;pointer-events:none}
 .card-img.dealing{animation:cardDeal .5s ease-out}
 @keyframes cardDeal{0%{transform:scale(.6) rotate(-15deg);opacity:0}100%{transform:scale(1) rotate(0);opacity:1}}
@@ -89,6 +88,17 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none;touch-action:
 .flash-nav{display:flex;gap:16px;margin-top:20px}
 .flash-nav button{background:var(--hotpink);color:#fff;font-weight:900;font-size:clamp(18px,4vw,24px);border-radius:50%;width:clamp(52px,13vw,60px);height:clamp(52px,13vw,60px);box-shadow:0 4px 0 rgba(0,0,0,.2)}
 .flash-nav .close{background:var(--purple)}
+#answerPopup{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:300;padding:20px}
+#answerPopup.show{display:flex}
+.answer-card{background:#fff;border-radius:28px;padding:clamp(20px,5vw,36px);max-width:420px;width:100%;text-align:center;box-shadow:0 16px 0 rgba(0,0,0,.2);animation:popIn .25s ease-out}
+@keyframes popIn{0%{transform:scale(.7);opacity:0}100%{transform:scale(1);opacity:1}}
+.answer-card>img{width:min(48vw,200px);height:min(48vw,200px);object-fit:contain}
+.answer-reading{font-size:clamp(28px,6vw,44px);font-weight:900;color:var(--hotpink);margin:4px 0 14px}
+.answer-prompt{font-size:clamp(14px,3vw,18px);font-weight:900;color:#666;margin-bottom:14px}
+.answer-players{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.answer-pbtn{min-width:80px;min-height:60px;border-radius:16px;font-size:clamp(18px,4vw,24px);font-weight:900;color:#fff;box-shadow:0 4px 0 rgba(0,0,0,.18);padding:10px 18px}
+.answer-pbtn:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.18)}
+.answer-skip{margin-top:16px;background:none;color:#bbb;font-weight:900;font-size:14px;text-decoration:underline}
 .winner-card{text-align:center}
 .winner-card h1{font-size:clamp(28px,7vw,64px);color:var(--hotpink);margin-bottom:16px}
 .scoreboard{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:20px 0}
@@ -199,6 +209,16 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none;touch-action:
 </div>
 </div>
 
+<div id="answerPopup">
+<div class="answer-card">
+<img id="answerImg" src="" alt="">
+<div class="answer-reading" id="answerReading"></div>
+<div class="answer-prompt" id="answerPrompt" data-th="ใครตอบถูก? แตะผู้เล่น" data-en="Who got it? Tap a player">ใครตอบถูก? แตะผู้เล่น</div>
+<div class="answer-players" id="answerPlayers"></div>
+<button class="answer-skip" onclick="closeAnswerPopup()" data-th="ข้าม (ไม่ให้คะแนน)" data-en="Skip (no point)">ข้าม (ไม่ให้คะแนน)</button>
+</div>
+</div>
+
 <div id="endScreen" class="screen">
 <button class="back-btn" onclick="show('titleScreen')">← Menu</button>
 <div class="panel winner-card">
@@ -266,10 +286,17 @@ let G = {players:2, rounds:46, current:0, scores:[0,0,0,0], active:0, cardA:null
 let LANG = 'th';
 let flashIdx = 0;
 
-// Speech Synthesis
-function speakRomaji(romaji){
+// ตำแหน่งกระจายตัวอักษร 8 ตัวในการ์ดวงกลม (1 กลาง + 7 รอบ) เป็น % ของการ์ด
+const CARD_POSITIONS = [
+  {x:50,y:50},{x:50,y:15},{x:77,y:28},{x:84,y:58},
+  {x:65,y:82},{x:35,y:82},{x:16,y:58},{x:23,y:28}
+];
+const PLAYER_COLORS = ['var(--hotpink)','var(--teal)','var(--orange)','var(--purple)'];
+
+// Speech Synthesis — อ่านเสียงภาษาญี่ปุ่นจากตัวอักษร
+function speakChar(text){
   if(!('speechSynthesis' in window)) return;
-  const utterance = new SpeechSynthesisUtterance(romaji);
+  const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = 'ja-JP';
   utterance.rate = 0.8;
   speechSynthesis.cancel();
@@ -325,18 +352,12 @@ function buildPlayerPanels(){
   for(let s of slots){
     if(s.idx>=G.players) continue;
     const div = document.createElement('div');
-    div.className = 'player '+s.cls + (s.idx===G.active?' active':'');
+    div.className = 'player '+s.cls;
     div.dataset.idx = s.idx;
     div.id = 'player'+s.idx;
     div.innerHTML = '<div class="player-name">'+s.name+'</div><div class="player-score" id="score'+s.idx+'">'+G.scores[s.idx]+'</div>';
-    div.onclick = ()=>setActivePlayer(s.idx);
     (s.side==='left'?left:right).appendChild(div);
   }
-}
-
-function setActivePlayer(i){
-  G.active = i;
-  document.querySelectorAll('.player').forEach(p=>p.classList.toggle('active', parseInt(p.dataset.idx)===i));
 }
 
 function generateCardPair(){
@@ -362,7 +383,8 @@ function nextRound(){
   document.getElementById('roundNum').textContent = G.current;
   G.awarded = false;
   G.selectedChar = null;
-  // reset next button label
+  document.getElementById('answerPopup').classList.remove('show');
+  // reset skip button label
   const nextBtn = document.querySelector('.next-btn');
   nextBtn.textContent = (LANG=='th'?'ข้าม ▶':'Skip ▶');
   nextBtn.onclick = nextRound;
@@ -379,9 +401,14 @@ function showCard(elId, charIndices){
   el.innerHTML = '';
   charIndices.forEach((idx, pos) => {
     const h = HIRAGANA_DATA[idx];
+    const p = CARD_POSITIONS[pos];
+    const rot = (Math.random()*24 - 12).toFixed(1);
     const div = document.createElement('div');
     div.className = 'card-char';
     div.dataset.idx = idx;
+    div.style.left = p.x + '%';
+    div.style.top = p.y + '%';
+    div.style.setProperty('--rot', rot + 'deg');
     div.innerHTML = '<img src="'+getHiraganaPath(h.file)+'" alt="'+h.char+'">';
     div.onclick = () => selectChar(idx);
     el.appendChild(div);
@@ -396,23 +423,43 @@ function selectChar(idx){
   if(idx !== G.commonIdx) return; // กดผิด: ไม่ทำอะไร
   G.awarded = true;
   G.selectedChar = idx;
-  awardPoint(G.active);
+  openAnswerPopup();
 }
 
-function awardPoint(i){
+// เปิดป๊อปอัพเฉลย + เสียงญี่ปุ่น + ปุ่มเลือกผู้เล่นที่ได้คะแนน
+function openAnswerPopup(){
+  const h = HIRAGANA_DATA[G.selectedChar];
+  document.getElementById('answerImg').src = getHiraganaPath(h.file);
+  document.getElementById('answerReading').textContent = h.char + ' (' + h.romaji + ')';
+  speakChar(h.char);
+  const wrap = document.getElementById('answerPlayers');
+  wrap.innerHTML = '';
+  for(let i=0;i<G.players;i++){
+    const b = document.createElement('button');
+    b.className = 'answer-pbtn';
+    b.style.background = PLAYER_COLORS[i];
+    b.textContent = 'P' + (i+1);
+    b.onclick = () => awardTo(i);
+    wrap.appendChild(b);
+  }
+  document.getElementById('answerPopup').classList.add('show');
+}
+
+// ให้คะแนนผู้เล่น i แล้วไปรอบถัดไป
+function awardTo(i){
   G.scores[i]++;
-  document.getElementById('score'+i).textContent = G.scores[i];
+  const sc = document.getElementById('score'+i);
+  if(sc) sc.textContent = G.scores[i];
   const pl = document.getElementById('player'+i);
   if(pl){ pl.classList.remove('flash'); void pl.offsetWidth; pl.classList.add('flash'); }
+  document.getElementById('answerPopup').classList.remove('show');
+  setTimeout(()=>nextRound(), 250);
+}
 
-  const h = HIRAGANA_DATA[G.selectedChar];
-  flashFeedback((LANG=='th'?'+1 ให้ P':'+1 to P')+(i+1)+' — '+h.char+' ('+h.romaji+') ✨');
-  speakRomaji(h.romaji);
-
-  const nextBtn = document.querySelector('.next-btn');
-  nextBtn.textContent = (LANG=='th'?'ถัดไป ▶':'Next ▶');
-  nextBtn.onclick = nextRound;
-  setTimeout(()=>nextRound(), 1600);
+// ปิดป๊อปอัพโดยไม่ให้คะแนน (กดผิดคน/ข้าม)
+function closeAnswerPopup(){
+  document.getElementById('answerPopup').classList.remove('show');
+  setTimeout(()=>nextRound(), 150);
 }
 
 function flashFeedback(text){
@@ -468,7 +515,7 @@ function showFlash(i){
   document.getElementById('flashImg').src = getHiraganaPath(h.file);
   document.getElementById('flashRomaji').textContent = h.char+' ('+h.romaji+')';
   document.getElementById('flashViewer').classList.add('show');
-  setTimeout(()=>speakRomaji(h.romaji), 300);
+  setTimeout(()=>speakChar(h.char), 300);
 }
 function flashPrev(){ flashIdx=(flashIdx-1+HIRAGANA_DATA.length)%HIRAGANA_DATA.length; showFlash(flashIdx); }
 function flashNext(){ flashIdx=(flashIdx+1)%HIRAGANA_DATA.length; showFlash(flashIdx); }
@@ -479,6 +526,11 @@ document.addEventListener('keydown', e=>{
     if(e.key==='ArrowLeft') flashPrev();
     if(e.key==='ArrowRight') flashNext();
     if(e.key==='Escape') closeFlash();
+    return;
+  }
+  if(document.getElementById('answerPopup').classList.contains('show')){
+    if(e.key>='1' && e.key<='4'){ const i=parseInt(e.key)-1; if(i<G.players) awardTo(i); }
+    else if(e.key==='Escape'){ closeAnswerPopup(); }
     return;
   }
   if(document.getElementById('gameScreen').classList.contains('active')){
