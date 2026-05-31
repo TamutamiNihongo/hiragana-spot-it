@@ -96,9 +96,14 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none;touch-action:
 .answer-reading{font-size:clamp(28px,6vw,44px);font-weight:900;color:var(--hotpink);margin:4px 0 14px}
 .answer-prompt{font-size:clamp(14px,3vw,18px);font-weight:900;color:#666;margin-bottom:14px}
 .answer-players{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
-.answer-pbtn{min-width:80px;min-height:60px;border-radius:16px;font-size:clamp(18px,4vw,24px);font-weight:900;color:#fff;box-shadow:0 4px 0 rgba(0,0,0,.18);padding:10px 18px}
+.answer-pbtn{position:relative;min-width:80px;min-height:60px;border-radius:16px;font-size:clamp(18px,4vw,24px);font-weight:900;color:#fff;box-shadow:0 4px 0 rgba(0,0,0,.18);padding:10px 18px;opacity:.72;transition:opacity .12s,transform .12s}
 .answer-pbtn:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.18)}
-.answer-skip{margin-top:16px;background:none;color:#bbb;font-weight:900;font-size:14px;text-decoration:underline}
+.answer-pbtn.selected{opacity:1;transform:translateY(-2px);box-shadow:0 0 0 4px #FFD700,0 6px 0 rgba(0,0,0,.18)}
+.answer-pbtn.selected::after{content:'✓';position:absolute;top:-8px;right:-8px;background:#FFD700;color:#7a4f00;width:24px;height:24px;border-radius:50%;font-size:15px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 4px rgba(0,0,0,.2)}
+.answer-confirm{margin-top:16px;background:var(--hotpink);color:#fff;font-weight:900;font-size:clamp(16px,4vw,22px);padding:12px 30px;border-radius:18px;box-shadow:0 5px 0 rgba(0,0,0,.18);min-height:54px;width:100%}
+.answer-confirm:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.18)}
+.answer-confirm:disabled{opacity:.4;box-shadow:0 5px 0 rgba(0,0,0,.1)}
+.answer-skip{margin-top:12px;background:none;color:#bbb;font-weight:900;font-size:14px;text-decoration:underline}
 .winner-card{text-align:center}
 .winner-card h1{font-size:clamp(28px,7vw,64px);color:var(--hotpink);margin-bottom:16px}
 .scoreboard{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:20px 0}
@@ -213,8 +218,9 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none;touch-action:
 <div class="answer-card">
 <img id="answerImg" src="" alt="">
 <div class="answer-reading" id="answerReading"></div>
-<div class="answer-prompt" id="answerPrompt" data-th="ใครตอบถูก? แตะผู้เล่น" data-en="Who got it? Tap a player">ใครตอบถูก? แตะผู้เล่น</div>
+<div class="answer-prompt" id="answerPrompt" data-th="ใครตอบถูก? แตะเลือกได้หลายคน" data-en="Who got it? Tap all that apply">ใครตอบถูก? แตะเลือกได้หลายคน</div>
 <div class="answer-players" id="answerPlayers"></div>
+<button class="answer-confirm" id="answerConfirm" onclick="confirmAward()" disabled data-th="ให้คะแนน ▶" data-en="Give points ▶">ให้คะแนน ▶</button>
 <button class="answer-skip" onclick="closeAnswerPopup()" data-th="ข้าม (ไม่ให้คะแนน)" data-en="Skip (no point)">ข้าม (ไม่ให้คะแนน)</button>
 </div>
 </div>
@@ -437,21 +443,41 @@ function openAnswerPopup(){
   for(let i=0;i<G.players;i++){
     const b = document.createElement('button');
     b.className = 'answer-pbtn';
+    b.dataset.idx = i;
     b.style.background = PLAYER_COLORS[i];
     b.textContent = 'P' + (i+1);
-    b.onclick = () => awardTo(i);
+    b.onclick = () => togglePlayer(b);
     wrap.appendChild(b);
   }
+  updateConfirmLabel();
   document.getElementById('answerPopup').classList.add('show');
 }
 
-// ให้คะแนนผู้เล่น i แล้วไปรอบถัดไป
-function awardTo(i){
-  G.scores[i]++;
-  const sc = document.getElementById('score'+i);
-  if(sc) sc.textContent = G.scores[i];
-  const pl = document.getElementById('player'+i);
-  if(pl){ pl.classList.remove('flash'); void pl.offsetWidth; pl.classList.add('flash'); }
+// แตะเลือก/ยกเลิกผู้เล่น (เลือกได้หลายคน)
+function togglePlayer(btn){
+  btn.classList.toggle('selected');
+  updateConfirmLabel();
+}
+
+function updateConfirmLabel(){
+  const n = document.querySelectorAll('.answer-pbtn.selected').length;
+  const btn = document.getElementById('answerConfirm');
+  btn.disabled = (n === 0);
+  const base = (LANG=='th'?'ให้คะแนน':'Give points');
+  btn.textContent = n>0 ? base+' (+1 × '+n+') ▶' : base+' ▶';
+}
+
+// ยืนยัน: +1 ให้ทุกคนที่เลือก แล้วไปรอบถัดไป
+function confirmAward(){
+  const picked = [...document.querySelectorAll('.answer-pbtn.selected')].map(b=>parseInt(b.dataset.idx));
+  if(picked.length === 0) return;
+  picked.forEach(i=>{
+    G.scores[i]++;
+    const sc = document.getElementById('score'+i);
+    if(sc) sc.textContent = G.scores[i];
+    const pl = document.getElementById('player'+i);
+    if(pl){ pl.classList.remove('flash'); void pl.offsetWidth; pl.classList.add('flash'); }
+  });
   document.getElementById('answerPopup').classList.remove('show');
   setTimeout(()=>nextRound(), 250);
 }
@@ -529,7 +555,8 @@ document.addEventListener('keydown', e=>{
     return;
   }
   if(document.getElementById('answerPopup').classList.contains('show')){
-    if(e.key>='1' && e.key<='4'){ const i=parseInt(e.key)-1; if(i<G.players) awardTo(i); }
+    if(e.key>='1' && e.key<='4'){ const i=parseInt(e.key)-1; if(i<G.players){ const b=document.querySelector('.answer-pbtn[data-idx="'+i+'"]'); if(b) togglePlayer(b); } }
+    else if(e.key==='Enter'){ e.preventDefault(); confirmAward(); }
     else if(e.key==='Escape'){ closeAnswerPopup(); }
     return;
   }
