@@ -238,25 +238,29 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none;touch-action:
 <div id="rulesScreen" class="screen">
 <button class="back-btn" onclick="show('titleScreen')">← Back</button>
 <div class="panel">
-<h2 data-th="กติกาการเล่น" data-en="How to Play">กติกาการเล่น</h2>
-<p>🎴 <span class="accent">การ์ด 46 ใบ</span> ใบละ <span class="accent">8 ตัวอักษรฮิระงะนะ</span> การ์ดทุกคู่จะมีตัวที่เหมือนกันอยู่ <span class="accent">1 ตัวเสมอ</span></p>
-<h3 style="color:var(--purple);margin-top:18px;font-size:22px" data-th="⚙️ ก่อนเริ่ม" data-en="⚙️ Setup">⚙️ ก่อนเริ่ม</h3>
+<h2 data-th="🎯 กติกาการเล่น" data-en="🎯 How to Play">🎯 กติกาการเล่น</h2>
+<p data-th="📌 <span class='accent'>การ์ดทั้งหมด 46 ใบ</span><br>การ์ดแต่ละใบมีอักษรฮิระงะนะ 8 ตัว และการ์ดทุกคู่จะมี <span class='accent'>ตัวอักษรที่เหมือนกันเพียง 1 ตัวเสมอ</span>" data-en="📌 <span class='accent'>46 cards in total</span><br>Each card shows 8 hiragana, and every pair of cards always shares <span class='accent'>exactly 1 matching character</span>.">📌 <span class="accent">การ์ดทั้งหมด 46 ใบ</span><br>การ์ดแต่ละใบมีอักษรฮิระงะนะ 8 ตัว และการ์ดทุกคู่จะมี <span class="accent">ตัวอักษรที่เหมือนกันเพียง 1 ตัวเสมอ</span></p>
+<h3 style="color:var(--purple);margin-top:18px;font-size:22px" data-th="⚙️ การเตรียมเกม" data-en="⚙️ Game Setup">⚙️ การเตรียมเกม</h3>
 <ol>
-<li data-th="เลือก <span class='accent'>จำนวนผู้เล่น</span> 1-4 คน และ <span class='accent'>จำนวนรอบ</span>" data-en="Choose <span class='accent'>1-4 players</span> and <span class='accent'>number of rounds</span>.">เลือกจำนวนผู้เล่น 1-4 คน และจำนวนรอบ</li>
-<li data-th="เลือก <span class='accent'>โหมดเวลา</span> — ไม่จับเวลา หรือ จับเวลาต่อรอบ (ตั้งวินาทีได้)" data-en="Choose <span class='accent'>timer mode</span> — no timer, or timed per round (set seconds).">เลือกโหมดเวลา — ไม่จับเวลา หรือ จับเวลาต่อรอบ</li>
+<li data-th="เลือกจำนวนผู้เล่น 1–4 คน" data-en="Choose 1–4 players.">เลือกจำนวนผู้เล่น 1–4 คน</li>
+<li data-th="กำหนดจำนวนรอบที่ต้องการเล่น" data-en="Set the number of rounds to play.">กำหนดจำนวนรอบที่ต้องการเล่น</li>
+<li data-th="เลือกโหมดการเล่น: <span class='accent'>ไม่จำกัดเวลา</span> หรือ <span class='accent'>จับเวลาต่อรอบ</span>" data-en="Choose a mode: <span class='accent'>no time limit</span> or <span class='accent'>timed per round</span>.">เลือกโหมดการเล่น: <span class="accent">ไม่จำกัดเวลา</span> หรือ <span class="accent">จับเวลาต่อรอบ</span></li>
 </ol>
 <h3 style="color:var(--orange);margin-top:18px;font-size:22px" data-th="🎮 วิธีเล่น" data-en="🎮 How to Play">🎮 วิธีเล่น</h3>
 <ol>
-<li data-th="การ์ด <span class='accent'>2 วง</span> ปรากฏขึ้นพร้อมกัน ใบละ 8 ตัวอักษร" data-en="Two round cards appear, 8 characters each.">การ์ด 2 วงปรากฏขึ้น ใบละ 8 ตัวอักษร</li>
-<li data-th="หา <span class='accent'>ตัวอักษรที่เหมือนกัน</span> บนการ์ดทั้งสอง แล้ว <span class='accent'>ออกเสียงดัง ๆ</span>" data-en="Find the <span class='accent'>matching character</span> on both cards, then <span class='accent'>say it out loud</span>.">หาตัวอักษรที่เหมือนกัน แล้วออกเสียงดัง ๆ</li>
-<li data-th="<span class='accent'>แตะตัวอักษรนั้น</span> บนการ์ด (ใครเห็นก่อนแตะก่อนได้เลย ไม่ต้องรอเทิร์น)" data-en="<span class='accent'>Tap that character</span> — anyone can tap first, no turns.">แตะตัวอักษรนั้น ใครเห็นก่อนแตะก่อนได้เลย</li>
-<li data-th="✅ <span class='accent'>ถ้าถูก</span> จะเด้งหน้าเฉลยพร้อมเสียงอ่าน → แตะเลือก <span class='accent'>ผู้เล่นที่ตอบได้</span> (เลือกหลายคนได้ถ้าตอบพร้อมกัน) แล้วกด ‘ให้คะแนน’ <span class='accent'>+1</span>" data-en="✅ <span class='accent'>Correct</span>: answer pops up with audio → tap <span class='accent'>the player(s)</span> who got it (multi-select allowed) then 'Give points' <span class='accent'>+1</span>.">ถ้าถูก เด้งเฉลย+เสียง แล้วเลือกผู้เล่นที่ตอบได้ (หลายคนได้) กดให้คะแนน +1</li>
-<li data-th="❌ <span class='accent'>ถ้าผิดหรือหมดเวลา</span> จะเด้งเฉลยให้ดูเหมือนกัน แต่ <span class='accent'>ไม่ได้คะแนน</span> (กันกดมั่ว) แล้วไปรอบถัดไป" data-en="❌ <span class='accent'>Wrong or time-up</span>: the answer is shown too, but <span class='accent'>no points</span> (anti-guessing), then next round.">ถ้าผิดหรือหมดเวลา เด้งเฉลยให้ดู แต่ไม่ได้คะแนน</li>
-<li data-th="เกมจบเมื่อครบรอบ ใครคะแนนสูงสุด <span class='accent'>ชนะ!</span> 🏆" data-en="Game ends when rounds run out. Highest score <span class='accent'>wins!</span> 🏆">เกมจบเมื่อครบรอบ ใครคะแนนสูงสุดชนะ! 🏆</li>
+<li data-th="เปิดการ์ด 2 ใบพร้อมกัน" data-en="Two cards are revealed at the same time.">เปิดการ์ด 2 ใบพร้อมกัน</li>
+<li data-th="มองหาตัวอักษรฮิระงะนะที่เหมือนกันบนการ์ดทั้งสองใบ" data-en="Find the matching hiragana on both cards.">มองหาตัวอักษรฮิระงะนะที่เหมือนกันบนการ์ดทั้งสองใบ</li>
+<li data-th="เมื่อพบแล้ว ให้ <span class='accent'>พูดเสียงของตัวอักษรนั้นออกมาดัง ๆ</span> จากนั้นกดที่ตัวอักษรดังกล่าวบนการ์ดใบใดก็ได้" data-en="When found, <span class='accent'>say its sound out loud</span>, then tap that character on either card.">เมื่อพบแล้ว ให้ <span class="accent">พูดเสียงของตัวอักษรนั้นออกมาดัง ๆ</span> จากนั้นกดที่ตัวอักษรดังกล่าวบนการ์ดใบใดก็ได้</li>
+<li data-th="ผู้เล่นที่ตอบถูกจะได้รับ <span class='accent'>1 คะแนน</span>" data-en="The player who answers correctly gets <span class='accent'>1 point</span>.">ผู้เล่นที่ตอบถูกจะได้รับ <span class="accent">1 คะแนน</span></li>
+<li data-th="หากมีผู้เล่นตอบถูกพร้อมกัน สามารถ <span class='accent'>ให้คะแนนผู้เล่นหลายคนได้พร้อมกัน</span> (P1–P4)" data-en="If several players answer at once, you can <span class='accent'>award multiple players together</span> (P1–P4).">หากมีผู้เล่นตอบถูกพร้อมกัน สามารถ <span class="accent">ให้คะแนนผู้เล่นหลายคนได้พร้อมกัน</span> (P1–P4)</li>
+<li data-th="หาก <span class='accent'>ตอบผิด หรือหมดเวลา</span> ที่กำหนด จะไม่ได้รับคะแนนในรอบนั้น" data-en="If the answer is <span class='accent'>wrong or time runs out</span>, no point is given for that round.">หาก <span class="accent">ตอบผิด หรือหมดเวลา</span> ที่กำหนด จะไม่ได้รับคะแนนในรอบนั้น</li>
+<li data-th="เล่นต่อจนครบจำนวนรอบที่กำหนด" data-en="Keep playing until all rounds are finished.">เล่นต่อจนครบจำนวนรอบที่กำหนด</li>
+<li data-th="ผู้ที่มี <span class='accent'>คะแนนรวมสูงสุดเป็นผู้ชนะ</span> 🏆" data-en="The player with the <span class='accent'>highest total score wins</span> 🏆">ผู้ที่มี <span class="accent">คะแนนรวมสูงสุดเป็นผู้ชนะ</span> 🏆</li>
 </ol>
-<h3 style="color:var(--teal);margin-top:18px;font-size:22px" data-th="💡 เคล็ดลับ & ประโยชน์" data-en="💡 Tips & Benefits">💡 เคล็ดลับ & ประโยชน์</h3>
-<p data-th="🎴 กดปุ่ม ‘ฝึกจำตัวอักษร’ ที่หน้าแรกเพื่อทบทวนฮิระงะนะทั้ง 46 ตัวพร้อมเสียงอ่านก่อนเล่น" data-en="🎴 Tap ‘Flashcards’ on the home screen to review all 46 hiragana with audio before playing.">🎴 กด ‘ฝึกจำตัวอักษร’ ที่หน้าแรกเพื่อทบทวน 46 ตัวพร้อมเสียงก่อนเล่น</p>
-<p data-th="✨ ฝึกสมองและทักษะการสังเกต พร้อมจดจำตัวอักษรฮิระงะนะอย่างสนุกสนาน" data-en="✨ Trains observation skills and helps memorize hiragana in a fun way.">✨ ฝึกสมองและการสังเกต พร้อมจดจำฮิระงะนะอย่างสนุกสนาน</p>
+<h3 style="color:var(--teal);margin-top:18px;font-size:22px" data-th="💡 เคล็ดลับ &amp; ประโยชน์" data-en="💡 Tips &amp; Benefits">💡 เคล็ดลับ &amp; ประโยชน์</h3>
+<p data-th="📖 กด ‘ฝึกจำตัวอักษร’ เพื่อทบทวนฮิระงะนะทั้ง 46 ตัวพร้อมเสียงก่อนเริ่มเล่น" data-en="📖 Tap ‘Flashcards’ to review all 46 hiragana with audio before you start.">📖 กด ‘ฝึกจำตัวอักษร’ เพื่อทบทวนฮิระงะนะทั้ง 46 ตัวพร้อมเสียงก่อนเริ่มเล่น</p>
+<p data-th="✨ ช่วยฝึกการสังเกต ความเร็วในการคิด และการจดจำตัวอักษรฮิระงะนะอย่างสนุกสนาน" data-en="✨ Builds observation, quick thinking, and hiragana memory — all in a fun way.">✨ ช่วยฝึกการสังเกต ความเร็วในการคิด และการจดจำตัวอักษรฮิระงะนะอย่างสนุกสนาน</p>
+<p data-th="👀 จำไว้! การ์ดทุกคู่จะมีตัวอักษรที่เหมือนกันอยู่ <span class='accent'>เพียง 1 ตัวเท่านั้น</span> จงสังเกตให้ดี!" data-en="👀 Remember! Every pair of cards shares <span class='accent'>only 1 matching character</span> — look carefully!">👀 จำไว้! การ์ดทุกคู่จะมีตัวอักษรที่เหมือนกันอยู่ <span class="accent">เพียง 1 ตัวเท่านั้น</span> จงสังเกตให้ดี!</p>
 </div>
 </div>
 
