@@ -353,7 +353,7 @@ const HIRAGANA_DATA = [
   {n:42, char:'れ', romaji:'re', file:'42-re.png'},
   {n:43, char:'ろ', romaji:'ro', file:'43-re.png'},
   {n:44, char:'わ', romaji:'wa', file:'44-wa.png'},
-  {n:45, char:'を', romaji:'wo', file:'45-(w)0.png'},
+  {n:45, char:'を', romaji:'(w)o', file:'45-(w)0.png'},
   {n:46, char:'ん', romaji:'n', file:'46-n.png'}
 ];
 
@@ -383,6 +383,11 @@ function speakChar(text){
 // Get image path
 function getHiraganaPath(file){
   return 'Hiragana a-n/'+encodeURIComponent(file);
+}
+
+// คำอ่าน: ปกติ "あ (a)" แต่ถ้า romaji มีวงเล็บอยู่แล้ว (เช่น (w)o) จะไม่ครอบวงเล็บซ้ำ
+function readingLabel(h){
+  return h.romaji.includes('(') ? (h.char+' '+h.romaji) : (h.char+' ('+h.romaji+')');
 }
 
 function show(id){
@@ -569,7 +574,7 @@ function openAnswerPopup(correct, wrongMsg){
   stopTimer();
   const h = HIRAGANA_DATA[G.selectedChar];
   document.getElementById('answerImg').src = getHiraganaPath(h.file);
-  document.getElementById('answerReading').textContent = h.char + ' (' + h.romaji + ')';
+  document.getElementById('answerReading').textContent = readingLabel(h);
   speakChar(h.char);
   const wrap = document.getElementById('answerPlayers');
   const confirmBtn = document.getElementById('answerConfirm');
@@ -671,7 +676,7 @@ function openFlashIndex(){
     HIRAGANA_DATA.forEach((h, i) => {
       const t = document.createElement('div');
       t.className = 'flash-tile';
-      t.innerHTML = '<img src="'+getHiraganaPath(h.file)+'"><div class="label">'+h.char+' ('+h.romaji+')</div>';
+      t.innerHTML = '<img src="'+getHiraganaPath(h.file)+'"><div class="label">'+readingLabel(h)+'</div>';
       t.onclick = ()=>showFlash(i);
       grid.appendChild(t);
     });
@@ -682,7 +687,7 @@ function showFlash(i){
   flashIdx = i;
   const h = HIRAGANA_DATA[i];
   document.getElementById('flashImg').src = getHiraganaPath(h.file);
-  document.getElementById('flashRomaji').textContent = h.char+' ('+h.romaji+')';
+  document.getElementById('flashRomaji').textContent = readingLabel(h);
   document.getElementById('flashViewer').classList.add('show');
   setTimeout(()=>speakChar(h.char), 300);
 }
