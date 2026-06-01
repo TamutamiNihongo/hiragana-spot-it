@@ -56,6 +56,9 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none;touch-action:
 .game-header{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;flex-shrink:0;flex-wrap:wrap;gap:6px}
 .game-header h2{color:var(--hotpink);font-weight:900;font-size:clamp(13px,3vw,26px);text-shadow:2px 2px 0 #fff}
 .round-info{background:#fff;padding:5px 12px;border-radius:24px;color:var(--hotpink);font-weight:900;font-size:clamp(12px,2vw,18px);box-shadow:0 3px 0 rgba(0,0,0,.1)}
+.timer-info{background:#fff;padding:5px 12px;border-radius:24px;color:var(--hotpink);font-weight:900;font-size:clamp(12px,2vw,18px);box-shadow:0 3px 0 rgba(0,0,0,.1);min-width:54px;text-align:center}
+.timer-info.low{background:#ffdce4;color:#d32f5b;animation:timerPulse .5s ease-in-out infinite alternate}
+@keyframes timerPulse{from{transform:scale(1)}to{transform:scale(1.1)}}
 .icon-btn{background:#fff;border-radius:50%;width:44px;height:44px;min-width:44px;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 3px 0 rgba(0,0,0,.1);color:var(--hotpink);font-weight:900;cursor:pointer;margin-left:6px}
 .icon-btn:hover{background:#FFE5EE}
 .next-btn{background:var(--hotpink);color:#fff;font-weight:900;padding:10px 18px;border-radius:20px;font-size:clamp(13px,2.5vw,17px);box-shadow:0 4px 0 rgba(0,0,0,.15);margin-left:6px;min-height:44px}
@@ -140,6 +143,9 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none;touch-action:
 .setup-card{background:#fff;border-radius:28px;padding:clamp(22px,6vw,40px) clamp(18px,5vw,50px);text-align:center;box-shadow:0 12px 0 rgba(0,0,0,.1);max-width:480px;width:100%}
 .setup-card h2{color:var(--hotpink);font-weight:900;font-size:clamp(22px,5vw,36px);margin-bottom:14px}
 .player-count{display:flex;gap:12px;justify-content:center;margin:18px 0;flex-wrap:wrap}
+.mode-toggle{display:flex;gap:10px;justify-content:center;margin:10px 0 4px;flex-wrap:wrap}
+.mode-opt{background:#FFE5EE;color:var(--hotpink);font-weight:900;font-size:clamp(15px,3.5vw,18px);padding:12px 20px;border-radius:14px;cursor:pointer;border:4px solid transparent;transition:all .15s;min-height:48px;display:flex;align-items:center}
+.mode-opt.selected{background:var(--hotpink);color:#fff;border-color:#fff;box-shadow:0 0 0 4px var(--hotpink)}
 .pc-opt{background:#FFE5EE;color:var(--hotpink);font-weight:900;font-size:clamp(20px,5vw,30px);width:clamp(62px,15vw,80px);height:clamp(62px,15vw,80px);border-radius:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;border:4px solid transparent;transition:all .15s}
 .pc-opt:hover{background:#FFD0E0}
 .pc-opt.selected{background:var(--hotpink);color:#fff;border-color:#fff;box-shadow:0 0 0 4px var(--hotpink)}
@@ -197,6 +203,15 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none;touch-action:
 <label data-th="จำนวนรอบ" data-en="Number of Rounds">จำนวนรอบ</label>
 <input type="number" id="roundsInput" value="46" min="5" max="46">
 </div>
+<div data-th="โหมดเวลา" data-en="Timer Mode" style="font-weight:900;color:#666;margin-top:14px">โหมดเวลา</div>
+<div class="mode-toggle">
+<div class="mode-opt selected" data-timed="0" onclick="setTimed(false)" data-th="🚫 ไม่จับเวลา" data-en="🚫 No timer">🚫 ไม่จับเวลา</div>
+<div class="mode-opt" data-timed="1" onclick="setTimed(true)" data-th="⏱ จับเวลา" data-en="⏱ Timed">⏱ จับเวลา</div>
+</div>
+<div class="rounds-input" id="timeLimitRow" style="display:none">
+<label data-th="วินาทีต่อรอบ" data-en="Seconds per round">วินาทีต่อรอบ</label>
+<input type="number" id="timeInput" value="15" min="5" max="60">
+</div>
 <button class="start-btn" onclick="startGame()" data-th="เริ่มเล่น!" data-en="Start!">เริ่มเล่น!</button>
 </div>
 </div>
@@ -206,6 +221,7 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none;touch-action:
 <button class="back-btn" style="position:static;margin:0" onclick="confirmExit()">← Menu</button>
 <h2>🎴 SPOT IT! Hiragana</h2>
 <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+<div class="timer-info" id="timerInfo" style="display:none">⏱ <span id="timerVal">15</span></div>
 <div class="round-info"><span data-th="รอบ" data-en="Round">รอบ</span> <span id="roundNum">1</span>/<span id="totalRounds">46</span></div>
 <button class="next-btn" onclick="nextRound()" data-th="ถัดไป ▶" data-en="Next ▶">ถัดไป ▶</button>
 <button class="icon-btn" onclick="resetScores()" title="Reset">↺</button>
@@ -223,18 +239,24 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none;touch-action:
 <button class="back-btn" onclick="show('titleScreen')">← Back</button>
 <div class="panel">
 <h2 data-th="กติกาการเล่น" data-en="How to Play">กติกาการเล่น</h2>
-<p>🎴 <span class="accent">การ์ด 46 ใบ</span> ใบละ <span class="accent">8 ตัวอักษร</span> ทุกคู่จะมีตัวที่เหมือนกัน <span class="accent">1 ตัว</span></p>
-<h3 style="color:var(--orange);margin-top:20px;font-size:24px" data-th="วิธีเล่น" data-en="How to Play">วิธีเล่น</h3>
+<p>🎴 <span class="accent">การ์ด 46 ใบ</span> ใบละ <span class="accent">8 ตัวอักษรฮิระงะนะ</span> การ์ดทุกคู่จะมีตัวที่เหมือนกันอยู่ <span class="accent">1 ตัวเสมอ</span></p>
+<h3 style="color:var(--purple);margin-top:18px;font-size:22px" data-th="⚙️ ก่อนเริ่ม" data-en="⚙️ Setup">⚙️ ก่อนเริ่ม</h3>
 <ol>
-<li data-th="คลิก ▶ เริ่มเกม แล้วเลือกจำนวนผู้เล่น (1-4 คน)" data-en="Click ▶ Play and choose 1-4 players.">คลิก ▶ เริ่มเกม แล้วเลือกจำนวนผู้เล่น (1-4 คน)</li>
-<li data-th="การ์ด 2 ใบจะปรากฏขึ้นพร้อมกัน" data-en="Two cards appear on the screen.">การ์ด 2 ใบจะปรากฏขึ้นพร้อมกัน</li>
-<li data-th="หา <span class='accent'>ตัวอักษรที่เหมือนกัน</span> บนการ์ดทั้งสองใบ แล้ว <span class='accent'>ออกเสียงตัวนั้นดัง ๆ</span>" data-en="Find the matching character on both cards, then say it out loud.">หาตัวอักษรที่เหมือนกัน แล้วออกเสียงดัง ๆ</li>
-<li data-th="(ผู้เล่นหลายคน) แตะที่ <span class='accent'>ป้ายผู้เล่นของตัวเอง</span> ก่อน เพื่อเลือกว่าใครเป็นคนตอบ" data-en="(Multiplayer) Tap your player panel first to choose who answers.">หลายคน: แตะป้ายผู้เล่นของตัวเองก่อน</li>
-<li data-th="แตะที่ <span class='accent'>ตัวอักษรที่เหมือนกัน</span> บนการ์ด ถ้าถูกจะ <span class='accent'>+1 คะแนน</span> พร้อมเสียงอ่านโรมาจิ" data-en="Tap the matching character. Correct = +1 point with romaji audio.">แตะตัวอักษรที่เหมือนกัน ถูก = +1 พร้อมเสียงอ่าน</li>
-<li data-th="เกมจบเมื่อครบรอบ ใครคะแนนสูงสุดชนะ! 🏆" data-en="The game ends when rounds run out. Highest score wins! 🏆">เกมจบเมื่อครบรอบ ใครคะแนนสูงสุดชนะ! 🏆</li>
+<li data-th="เลือก <span class='accent'>จำนวนผู้เล่น</span> 1-4 คน และ <span class='accent'>จำนวนรอบ</span>" data-en="Choose <span class='accent'>1-4 players</span> and <span class='accent'>number of rounds</span>.">เลือกจำนวนผู้เล่น 1-4 คน และจำนวนรอบ</li>
+<li data-th="เลือก <span class='accent'>โหมดเวลา</span> — ไม่จับเวลา หรือ จับเวลาต่อรอบ (ตั้งวินาทีได้)" data-en="Choose <span class='accent'>timer mode</span> — no timer, or timed per round (set seconds).">เลือกโหมดเวลา — ไม่จับเวลา หรือ จับเวลาต่อรอบ</li>
 </ol>
-<h3 style="color:var(--teal);margin-top:20px;font-size:24px" data-th="ประโยชน์" data-en="Benefits">ประโยชน์</h3>
-<p data-th="✨ ฝึกสมองและเพิ่มพูนทักษะการสังเกต พร้อมจดจำตัวอักษรฮิระงะนะอย่างสนุกสนาน" data-en="✨ Trains observation and helps memorize Hiragana in a fun way.">✨ ฝึกสมองและเพิ่มพูนทักษะการสังเกต พร้อมจดจำตัวอักษรฮิระงะนะอย่างสนุกสนาน</p>
+<h3 style="color:var(--orange);margin-top:18px;font-size:22px" data-th="🎮 วิธีเล่น" data-en="🎮 How to Play">🎮 วิธีเล่น</h3>
+<ol>
+<li data-th="การ์ด <span class='accent'>2 วง</span> ปรากฏขึ้นพร้อมกัน ใบละ 8 ตัวอักษร" data-en="Two round cards appear, 8 characters each.">การ์ด 2 วงปรากฏขึ้น ใบละ 8 ตัวอักษร</li>
+<li data-th="หา <span class='accent'>ตัวอักษรที่เหมือนกัน</span> บนการ์ดทั้งสอง แล้ว <span class='accent'>ออกเสียงดัง ๆ</span>" data-en="Find the <span class='accent'>matching character</span> on both cards, then <span class='accent'>say it out loud</span>.">หาตัวอักษรที่เหมือนกัน แล้วออกเสียงดัง ๆ</li>
+<li data-th="<span class='accent'>แตะตัวอักษรนั้น</span> บนการ์ด (ใครเห็นก่อนแตะก่อนได้เลย ไม่ต้องรอเทิร์น)" data-en="<span class='accent'>Tap that character</span> — anyone can tap first, no turns.">แตะตัวอักษรนั้น ใครเห็นก่อนแตะก่อนได้เลย</li>
+<li data-th="✅ <span class='accent'>ถ้าถูก</span> จะเด้งหน้าเฉลยพร้อมเสียงอ่าน → แตะเลือก <span class='accent'>ผู้เล่นที่ตอบได้</span> (เลือกหลายคนได้ถ้าตอบพร้อมกัน) แล้วกด ‘ให้คะแนน’ <span class='accent'>+1</span>" data-en="✅ <span class='accent'>Correct</span>: answer pops up with audio → tap <span class='accent'>the player(s)</span> who got it (multi-select allowed) then 'Give points' <span class='accent'>+1</span>.">ถ้าถูก เด้งเฉลย+เสียง แล้วเลือกผู้เล่นที่ตอบได้ (หลายคนได้) กดให้คะแนน +1</li>
+<li data-th="❌ <span class='accent'>ถ้าผิดหรือหมดเวลา</span> จะเด้งเฉลยให้ดูเหมือนกัน แต่ <span class='accent'>ไม่ได้คะแนน</span> (กันกดมั่ว) แล้วไปรอบถัดไป" data-en="❌ <span class='accent'>Wrong or time-up</span>: the answer is shown too, but <span class='accent'>no points</span> (anti-guessing), then next round.">ถ้าผิดหรือหมดเวลา เด้งเฉลยให้ดู แต่ไม่ได้คะแนน</li>
+<li data-th="เกมจบเมื่อครบรอบ ใครคะแนนสูงสุด <span class='accent'>ชนะ!</span> 🏆" data-en="Game ends when rounds run out. Highest score <span class='accent'>wins!</span> 🏆">เกมจบเมื่อครบรอบ ใครคะแนนสูงสุดชนะ! 🏆</li>
+</ol>
+<h3 style="color:var(--teal);margin-top:18px;font-size:22px" data-th="💡 เคล็ดลับ & ประโยชน์" data-en="💡 Tips & Benefits">💡 เคล็ดลับ & ประโยชน์</h3>
+<p data-th="🎴 กดปุ่ม ‘ฝึกจำตัวอักษร’ ที่หน้าแรกเพื่อทบทวนฮิระงะนะทั้ง 46 ตัวพร้อมเสียงอ่านก่อนเล่น" data-en="🎴 Tap ‘Flashcards’ on the home screen to review all 46 hiragana with audio before playing.">🎴 กด ‘ฝึกจำตัวอักษร’ ที่หน้าแรกเพื่อทบทวน 46 ตัวพร้อมเสียงก่อนเล่น</p>
+<p data-th="✨ ฝึกสมองและทักษะการสังเกต พร้อมจดจำตัวอักษรฮิระงะนะอย่างสนุกสนาน" data-en="✨ Trains observation skills and helps memorize hiragana in a fun way.">✨ ฝึกสมองและการสังเกต พร้อมจดจำฮิระงะนะอย่างสนุกสนาน</p>
 </div>
 </div>
 
@@ -333,7 +355,7 @@ const HIRAGANA_DATA = [
 
 const TOTAL_CARDS = 46;
 
-let G = {players:2, rounds:46, current:0, scores:[0,0,0,0], active:0, cardA:null, cardB:null, awarded:false, commonIdx:null, selectedChar:null};
+let G = {players:2, rounds:46, current:0, scores:[0,0,0,0], active:0, cardA:null, cardB:null, awarded:false, commonIdx:null, selectedChar:null, timed:false, timeLimit:15, timeLeft:15, timerId:null};
 let LANG = 'th';
 let flashIdx = 0;
 
@@ -365,7 +387,7 @@ function show(id){
 }
 function goSetup(){ show('setupScreen'); }
 function exitGame(){ if(confirm(LANG=='th'?'ออกจากเกม?':'Exit game?')) window.close(); }
-function confirmExit(){ if(confirm(LANG=='th'?'ออกไปยังหน้าหลัก?':'Return to main menu?')) show('titleScreen'); }
+function confirmExit(){ if(confirm(LANG=='th'?'ออกไปยังหน้าหลัก?':'Return to main menu?')){ stopTimer(); show('titleScreen'); } }
 
 function toggleLang(){
   LANG = LANG==='th'?'en':'th';
@@ -402,6 +424,40 @@ function setPlayers(n){
   document.querySelectorAll('.pc-opt').forEach(el=>{ el.classList.toggle('selected', parseInt(el.dataset.count)===n); });
 }
 
+function setTimed(on){
+  document.querySelectorAll('.mode-opt').forEach(el=>{ el.classList.toggle('selected', (el.dataset.timed==='1')===on); });
+  document.getElementById('timeLimitRow').style.display = on ? '' : 'none';
+}
+
+// ===== TIMER (โหมดจับเวลาต่อรอบ) =====
+function startTimer(){
+  stopTimer();
+  const info = document.getElementById('timerInfo');
+  if(!G.timed){ info.style.display='none'; return; }
+  G.timeLeft = G.timeLimit;
+  info.style.display='';
+  updateTimerDisplay();
+  G.timerId = setInterval(()=>{
+    G.timeLeft--;
+    updateTimerDisplay();
+    if(G.timeLeft<=0){ stopTimer(); timeUp(); }
+  }, 1000);
+}
+function stopTimer(){
+  if(G.timerId){ clearInterval(G.timerId); G.timerId=null; }
+}
+function updateTimerDisplay(){
+  const info = document.getElementById('timerInfo');
+  document.getElementById('timerVal').textContent = Math.max(0,G.timeLeft);
+  info.classList.toggle('low', G.timeLeft<=5);
+}
+function timeUp(){
+  if(G.awarded) return;
+  G.awarded = true;
+  G.selectedChar = G.commonIdx;
+  openAnswerPopup(false, (LANG=='th'?'หมดเวลา ⏰ เฉลยที่ถูกคือ':'Time up ⏰ The answer is'));
+}
+
 function shuffle(arr){
   for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]]; }
   return arr;
@@ -409,6 +465,8 @@ function shuffle(arr){
 
 function startGame(){
   G.rounds = Math.max(5, Math.min(46, parseInt(document.getElementById('roundsInput').value)||46));
+  G.timed = document.querySelector('.mode-opt.selected')?.dataset.timed === '1';
+  G.timeLimit = Math.max(5, Math.min(60, parseInt(document.getElementById('timeInput').value)||15));
   G.current = 0; G.scores = [0,0,0,0]; G.active = 0;
   G.cardA = null; G.cardB = null; G.awarded = false;
   document.getElementById('totalRounds').textContent = G.rounds;
@@ -467,6 +525,7 @@ function nextRound(){
   G.cardB = cardB;
   showCard('card1', cardA);
   showCard('card2', cardB);
+  startTimer();
 }
 
 function showCard(elId, charIndices){
@@ -502,7 +561,8 @@ function selectChar(idx){
 // เปิดป๊อปอัพเฉลย + เสียงญี่ปุ่น
 // correct = true  -> มีปุ่มเลือกผู้เล่นให้คะแนน
 // correct = false -> กดผิด: โชว์เฉลยอย่างเดียว ไม่ให้คะแนน (มีแค่ปุ่มข้าม)
-function openAnswerPopup(correct){
+function openAnswerPopup(correct, wrongMsg){
+  stopTimer();
   const h = HIRAGANA_DATA[G.selectedChar];
   document.getElementById('answerImg').src = getHiraganaPath(h.file);
   document.getElementById('answerReading').textContent = h.char + ' (' + h.romaji + ')';
@@ -525,7 +585,7 @@ function openAnswerPopup(correct){
     confirmBtn.style.display = '';
     updateConfirmLabel();
   } else {
-    prompt.textContent = (LANG=='th'?'ตอบผิด 😅 เฉลยที่ถูกคือ':'Wrong 😅 The answer is');
+    prompt.textContent = wrongMsg || (LANG=='th'?'ตอบผิด 😅 เฉลยที่ถูกคือ':'Wrong 😅 The answer is');
     confirmBtn.style.display = 'none';
   }
   document.getElementById('answerPopup').classList.add('show');
@@ -582,6 +642,7 @@ function resetScores(){
 }
 
 function endGame(){
+  stopTimer();
   const board = document.getElementById('finalScoreboard');
   board.innerHTML='';
   const max = Math.max(...G.scores.slice(0,G.players));
