@@ -260,6 +260,7 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none;touch-action:
 <h3 style="color:var(--teal);margin-top:18px;font-size:22px" data-th="💡 เคล็ดลับ &amp; ประโยชน์" data-en="💡 Tips &amp; Benefits">💡 เคล็ดลับ &amp; ประโยชน์</h3>
 <p data-th="📖 กด ‘ฝึกจำตัวอักษร’ เพื่อทบทวนฮิระงะนะทั้ง 46 ตัวพร้อมเสียงก่อนเริ่มเล่น" data-en="📖 Tap ‘Flashcards’ to review all 46 hiragana with audio before you start.">📖 กด ‘ฝึกจำตัวอักษร’ เพื่อทบทวนฮิระงะนะทั้ง 46 ตัวพร้อมเสียงก่อนเริ่มเล่น</p>
 <p data-th="✨ ช่วยฝึกการสังเกต ความเร็วในการคิด และการจดจำตัวอักษรฮิระงะนะอย่างสนุกสนาน" data-en="✨ Builds observation, quick thinking, and hiragana memory — all in a fun way.">✨ ช่วยฝึกการสังเกต ความเร็วในการคิด และการจดจำตัวอักษรฮิระงะนะอย่างสนุกสนาน</p>
+<p data-th="🔁 เล่นครบ 46 รอบ ตัวเฉลยจะ <span class='accent'>ครบทั้ง 46 ตัวแบบไม่ซ้ำกัน</span> นักเรียนจึงได้ฝึกทุกตัวในการเล่น 1 ครั้ง" data-en="🔁 Play all 46 rounds and the answers cover <span class='accent'>all 46 characters with no repeats</span> — students practice every character in one game.">🔁 เล่นครบ 46 รอบ ตัวเฉลยจะ <span class="accent">ครบทั้ง 46 ตัวแบบไม่ซ้ำกัน</span> นักเรียนจึงได้ฝึกทุกตัวในการเล่น 1 ครั้ง</p>
 <p data-th="👀 จำไว้! การ์ดทุกคู่จะมีตัวอักษรที่เหมือนกันอยู่ <span class='accent'>เพียง 1 ตัวเท่านั้น</span> จงสังเกตให้ดี!" data-en="👀 Remember! Every pair of cards shares <span class='accent'>only 1 matching character</span> — look carefully!">👀 จำไว้! การ์ดทุกคู่จะมีตัวอักษรที่เหมือนกันอยู่ <span class="accent">เพียง 1 ตัวเท่านั้น</span> จงสังเกตให้ดี!</p>
 </div>
 </div>
@@ -359,7 +360,7 @@ const HIRAGANA_DATA = [
 
 const TOTAL_CARDS = 46;
 
-let G = {players:2, rounds:46, current:0, scores:[0,0,0,0], active:0, cardA:null, cardB:null, awarded:false, commonIdx:null, selectedChar:null, timed:false, timeLimit:15, timeLeft:15, timerId:null};
+let G = {players:2, rounds:46, current:0, scores:[0,0,0,0], active:0, cardA:null, cardB:null, awarded:false, commonIdx:null, selectedChar:null, timed:false, timeLimit:15, timeLeft:15, timerId:null, answerOrder:[]};
 let LANG = 'th';
 let flashIdx = 0;
 
@@ -476,6 +477,7 @@ function startGame(){
   G.rounds = Math.max(5, Math.min(46, parseInt(document.getElementById('roundsInput').value)||46));
   G.timed = document.querySelector('.mode-opt.selected')?.dataset.timed === '1';
   G.timeLimit = Math.max(5, Math.min(60, parseInt(document.getElementById('timeInput').value)||15));
+  G.answerOrder = shuffle(Array.from({length:TOTAL_CARDS},(_,i)=>i)); // เฉลยครบ 46 ตัวแบบไม่ซ้ำ
   G.current = 0; G.scores = [0,0,0,0]; G.active = 0;
   G.cardA = null; G.cardB = null; G.awarded = false;
   document.getElementById('totalRounds').textContent = G.rounds;
@@ -500,18 +502,22 @@ function buildPlayerPanels(){
   }
 }
 
-function generateCardPair(){
-  const cardA = [];
-  while(cardA.length < 8){
-    const idx = Math.floor(Math.random() * TOTAL_CARDS);
-    if(!cardA.includes(idx)) cardA.push(idx);
-  }
-  const common = cardA[Math.floor(Math.random() * 8)];
+// สร้างการ์ด 2 ใบที่มีตัวเหมือนกัน 1 ตัว (common) ตามที่กำหนด
+function generateCardPair(common){
+  // cardA = common + อีก 7 ตัวสุ่ม (ไม่ซ้ำ common)
+  const pool = [];
+  for(let i=0;i<TOTAL_CARDS;i++) if(i!==common) pool.push(i);
+  shuffle(pool);
+  const cardA = [common];
+  for(let k=0;k<7;k++) cardA.push(pool[k]);
+  // cardB = common + อีก 7 ตัวที่ไม่อยู่ใน cardA (ให้เหมือนกันแค่ common ตัวเดียว)
+  const used = new Set(cardA);
+  const restB = [];
+  for(let i=0;i<TOTAL_CARDS;i++) if(!used.has(i)) restB.push(i);
+  shuffle(restB);
   const cardB = [common];
-  const remaining = [];
-  for(let i=0;i<TOTAL_CARDS;i++) if(!cardA.includes(i)) remaining.push(i);
-  shuffle(remaining);
-  while(cardB.length < 8){ cardB.push(remaining.pop()); }
+  for(let k=0;k<7;k++) cardB.push(restB[k]);
+  shuffle(cardA);
   shuffle(cardB);
   G.commonIdx = common;
   return [cardA, cardB];
@@ -529,7 +535,8 @@ function nextRound(){
   nextBtn.textContent = (LANG=='th'?'ข้าม ▶':'Skip ▶');
   nextBtn.onclick = nextRound;
 
-  const [cardA, cardB] = generateCardPair();
+  const common = G.answerOrder[(G.current-1) % G.answerOrder.length];
+  const [cardA, cardB] = generateCardPair(common);
   G.cardA = cardA;
   G.cardB = cardB;
   showCard('card1', cardA);
@@ -647,6 +654,7 @@ function resetScores(){
   if(!confirm(LANG=='th'?'รีเซ็ตคะแนน?':'Reset scores?')) return;
   G.scores=[0,0,0,0];
   for(let i=0;i<4;i++){ const el=document.getElementById('score'+i); if(el) el.textContent='0'; }
+  G.answerOrder = shuffle(Array.from({length:TOTAL_CARDS},(_,i)=>i));
   G.current=0; nextRound();
 }
 
