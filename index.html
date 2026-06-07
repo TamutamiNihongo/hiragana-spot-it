@@ -59,6 +59,7 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none;touch-action:
 .timer-info{background:#fff;padding:5px 12px;border-radius:24px;color:var(--hotpink);font-weight:900;font-size:clamp(12px,2vw,18px);box-shadow:0 3px 0 rgba(0,0,0,.1);min-width:54px;text-align:center}
 .timer-info.low{background:#ffdce4;color:#d32f5b;animation:timerPulse .5s ease-in-out infinite alternate}
 @keyframes timerPulse{from{transform:scale(1)}to{transform:scale(1.1)}}
+.turn-banner{flex-shrink:0;align-self:center;text-align:center;font-weight:900;font-size:clamp(15px,3.5vw,22px);color:#fff;background:var(--hotpink);margin:4px auto 0;padding:6px 24px;border-radius:22px;box-shadow:0 4px 0 rgba(0,0,0,.12)}
 .icon-btn{background:#fff;border-radius:50%;width:44px;height:44px;min-width:44px;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 3px 0 rgba(0,0,0,.1);color:var(--hotpink);font-weight:900;cursor:pointer;margin-left:6px}
 .icon-btn:hover{background:#FFE5EE}
 .next-btn{background:var(--hotpink);color:#fff;font-weight:900;padding:10px 18px;border-radius:20px;font-size:clamp(13px,2.5vw,17px);box-shadow:0 4px 0 rgba(0,0,0,.15);margin-left:6px;min-height:44px}
@@ -144,8 +145,8 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none;touch-action:
 .setup-card h2{color:var(--hotpink);font-weight:900;font-size:clamp(22px,5vw,36px);margin-bottom:14px}
 .player-count{display:flex;gap:12px;justify-content:center;margin:18px 0;flex-wrap:wrap}
 .mode-toggle{display:flex;gap:10px;justify-content:center;margin:10px 0 4px;flex-wrap:wrap}
-.mode-opt{background:#FFE5EE;color:var(--hotpink);font-weight:900;font-size:clamp(15px,3.5vw,18px);padding:12px 20px;border-radius:14px;cursor:pointer;border:4px solid transparent;transition:all .15s;min-height:48px;display:flex;align-items:center}
-.mode-opt.selected{background:var(--hotpink);color:#fff;border-color:#fff;box-shadow:0 0 0 4px var(--hotpink)}
+.mode-opt,.gm-opt{background:#FFE5EE;color:var(--hotpink);font-weight:900;font-size:clamp(14px,3.3vw,17px);padding:12px 18px;border-radius:14px;cursor:pointer;border:4px solid transparent;transition:all .15s;min-height:48px;display:flex;align-items:center}
+.mode-opt.selected,.gm-opt.selected{background:var(--hotpink);color:#fff;border-color:#fff;box-shadow:0 0 0 4px var(--hotpink)}
 .pc-opt{background:#FFE5EE;color:var(--hotpink);font-weight:900;font-size:clamp(20px,5vw,30px);width:clamp(62px,15vw,80px);height:clamp(62px,15vw,80px);border-radius:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;border:4px solid transparent;transition:all .15s}
 .pc-opt:hover{background:#FFD0E0}
 .pc-opt.selected{background:var(--hotpink);color:#fff;border-color:#fff;box-shadow:0 0 0 4px var(--hotpink)}
@@ -192,6 +193,11 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none;touch-action:
 <button class="back-btn" onclick="show('titleScreen')">← Back</button>
 <div class="setup-card">
 <h2 data-th="ตั้งค่าเกม" data-en="Game Setup">ตั้งค่าเกม</h2>
+<div data-th="โหมดเกม" data-en="Game Mode" style="font-weight:900;color:#666;margin-top:4px">โหมดเกม</div>
+<div class="mode-toggle">
+<div class="gm-opt selected" data-mode="challenge" onclick="setMode('challenge')" data-th="🏆 แข่งขัน (ซามุไร)" data-en="🏆 Challenge (Samurai)">🏆 แข่งขัน (ซามุไร)</div>
+<div class="gm-opt" data-mode="practice" onclick="setMode('practice')" data-th="🐣 ฝึกหัด (เบบี้)" data-en="🐣 Practice (Baby)">🐣 ฝึกหัด (เบบี้)</div>
+</div>
 <div data-th="จำนวนผู้เล่น" data-en="Number of Players" style="font-weight:900;color:#666;margin-top:10px">จำนวนผู้เล่น</div>
 <div class="player-count">
 <div class="pc-opt" data-count="1" onclick="setPlayers(1)">1</div>
@@ -227,6 +233,7 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none;touch-action:
 <button class="icon-btn" onclick="resetScores()" title="Reset">↺</button>
 </div>
 </div>
+<div id="turnBanner" class="turn-banner" style="display:none"></div>
 <div class="game-main">
 <div class="player-col" id="leftPlayers"></div>
 <div class="cards-area"><div class="card-img" id="card1"></div><div class="card-img" id="card2"></div></div>
@@ -240,6 +247,11 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none;touch-action:
 <div class="panel">
 <h2 data-th="🎯 กติกาการเล่น" data-en="🎯 How to Play">🎯 กติกาการเล่น</h2>
 <p data-th="📌 <span class='accent'>การ์ดทั้งหมด 46 ใบ</span><br>การ์ดแต่ละใบมีอักษรฮิระงะนะ 8 ตัว และการ์ดทุกคู่จะมี <span class='accent'>ตัวอักษรที่เหมือนกันเพียง 1 ตัวเสมอ</span>" data-en="📌 <span class='accent'>46 cards in total</span><br>Each card shows 8 hiragana, and every pair of cards always shares <span class='accent'>exactly 1 matching character</span>.">📌 <span class="accent">การ์ดทั้งหมด 46 ใบ</span><br>การ์ดแต่ละใบมีอักษรฮิระงะนะ 8 ตัว และการ์ดทุกคู่จะมี <span class="accent">ตัวอักษรที่เหมือนกันเพียง 1 ตัวเสมอ</span></p>
+<h3 style="color:var(--hotpink);margin-top:18px;font-size:22px" data-th="🎲 โหมดเกม" data-en="🎲 Game Modes">🎲 โหมดเกม</h3>
+<ol>
+<li data-th="🏆 <span class='accent'>โหมดแข่งขัน (ซามุไร)</span> — ทุกคนแข่งกัน ใครเห็นตัวที่เหมือนกันก่อนก็แตะก่อนได้เลย ถ้าตอบพร้อมกันให้คะแนนหลายคนได้" data-en="🏆 <span class='accent'>Challenge (Samurai)</span> — everyone races; whoever spots the match taps first. Ties can award several players.">🏆 <span class="accent">โหมดแข่งขัน (ซามุไร)</span> — ทุกคนแข่งกัน ใครเห็นก่อนแตะก่อน ถ้าพร้อมกันให้หลายคนได้</li>
+<li data-th="🐣 <span class='accent'>โหมดฝึกหัด (เบบี้)</span> — เล่นทีละคนวนตา (P1→P2→…) เหมาะกับมือใหม่ ถ้ามี <span class='accent'>เพื่อนช่วยใบ้</span> จะแบ่งคะแนนคนละครึ่ง (คนตอบ +0.5 / เพื่อน +0.5)" data-en="🐣 <span class='accent'>Practice (Baby)</span> — take turns one by one (P1→P2→…), great for beginners. If a <span class='accent'>friend helps</span>, the point is split (answerer +0.5 / helper +0.5).">🐣 <span class="accent">โหมดฝึกหัด (เบบี้)</span> — เล่นทีละคนวนตา เหมาะมือใหม่ มีเพื่อนช่วยแบ่งครึ่งคะแนน</li>
+</ol>
 <h3 style="color:var(--purple);margin-top:18px;font-size:22px" data-th="⚙️ การเตรียมเกม" data-en="⚙️ Game Setup">⚙️ การเตรียมเกม</h3>
 <ol>
 <li data-th="เลือกจำนวนผู้เล่น 1–4 คน" data-en="Choose 1–4 players.">เลือกจำนวนผู้เล่น 1–4 คน</li>
@@ -360,7 +372,12 @@ const HIRAGANA_DATA = [
 
 const TOTAL_CARDS = 46;
 
-let G = {players:2, rounds:46, current:0, scores:[0,0,0,0], active:0, cardA:null, cardB:null, awarded:false, commonIdx:null, selectedChar:null, timed:false, timeLimit:15, timeLeft:15, timerId:null, answerOrder:[]};
+let G = {players:2, rounds:46, current:0, scores:[0,0,0,0], active:0, cardA:null, cardB:null, awarded:false, commonIdx:null, selectedChar:null, timed:false, timeLimit:15, timeLeft:15, timerId:null, answerOrder:[], mode:'challenge', turn:0};
+
+// แสดงคะแนน รองรับทศนิยม .5 (เช่น 3.5)
+function scoreText(v){ return Number.isInteger(v) ? String(v) : v.toFixed(1); }
+function updateScore(i){ const el=document.getElementById('score'+i); if(el) el.textContent=scoreText(G.scores[i]); }
+function flashPlayer(i){ const pl=document.getElementById('player'+i); if(pl){ pl.classList.remove('flash'); void pl.offsetWidth; pl.classList.add('flash'); } }
 let LANG = 'th';
 let flashIdx = 0;
 
@@ -439,6 +456,10 @@ function setTimed(on){
   document.getElementById('timeLimitRow').style.display = on ? '' : 'none';
 }
 
+function setMode(m){
+  document.querySelectorAll('.gm-opt').forEach(el=>{ el.classList.toggle('selected', el.dataset.mode===m); });
+}
+
 // ===== TIMER (โหมดจับเวลาต่อรอบ) =====
 function startTimer(){
   stopTimer();
@@ -477,8 +498,9 @@ function startGame(){
   G.rounds = Math.max(5, Math.min(46, parseInt(document.getElementById('roundsInput').value)||46));
   G.timed = document.querySelector('.mode-opt.selected')?.dataset.timed === '1';
   G.timeLimit = Math.max(5, Math.min(60, parseInt(document.getElementById('timeInput').value)||15));
+  G.mode = document.querySelector('.gm-opt.selected')?.dataset.mode || 'challenge';
   G.answerOrder = shuffle(Array.from({length:TOTAL_CARDS},(_,i)=>i)); // เฉลยครบ 46 ตัวแบบไม่ซ้ำ
-  G.current = 0; G.scores = [0,0,0,0]; G.active = 0;
+  G.current = 0; G.scores = [0,0,0,0]; G.active = 0; G.turn = 0;
   G.cardA = null; G.cardB = null; G.awarded = false;
   document.getElementById('totalRounds').textContent = G.rounds;
   buildPlayerPanels();
@@ -497,7 +519,7 @@ function buildPlayerPanels(){
     div.className = 'player '+s.cls;
     div.dataset.idx = s.idx;
     div.id = 'player'+s.idx;
-    div.innerHTML = '<div class="player-name">'+s.name+'</div><div class="player-score" id="score'+s.idx+'">'+G.scores[s.idx]+'</div>';
+    div.innerHTML = '<div class="player-name">'+s.name+'</div><div class="player-score" id="score'+s.idx+'">'+scoreText(G.scores[s.idx])+'</div>';
     (s.side==='left'?left:right).appendChild(div);
   }
 }
@@ -534,6 +556,19 @@ function nextRound(){
   const nextBtn = document.querySelector('.next-btn');
   nextBtn.textContent = (LANG=='th'?'ข้าม ▶':'Skip ▶');
   nextBtn.onclick = nextRound;
+
+  // โหมดฝึกหัด: วนตาทีละคน + แสดงแบนเนอร์ "ตาของ P_"
+  const tb = document.getElementById('turnBanner');
+  if(G.mode === 'practice'){
+    G.turn = (G.current-1) % G.players;
+    tb.style.display = '';
+    tb.style.background = PLAYER_COLORS[G.turn];
+    tb.textContent = (LANG=='th' ? '🐣 ตาของ P'+(G.turn+1) : "🐣 P"+(G.turn+1)+"'s turn");
+    document.querySelectorAll('.player').forEach(p=>p.classList.toggle('active', parseInt(p.dataset.idx)===G.turn));
+  } else {
+    tb.style.display = 'none';
+    document.querySelectorAll('.player').forEach(p=>p.classList.remove('active'));
+  }
 
   const common = G.answerOrder[(G.current-1) % G.answerOrder.length];
   const [cardA, cardB] = generateCardPair(common);
@@ -587,7 +622,9 @@ function openAnswerPopup(correct, wrongMsg){
   const confirmBtn = document.getElementById('answerConfirm');
   const prompt = document.getElementById('answerPrompt');
   wrap.innerHTML = '';
-  if(correct){
+  if(correct && G.mode === 'practice'){
+    buildPracticeChoices(prompt, wrap, confirmBtn);
+  } else if(correct){
     prompt.textContent = (LANG=='th'?'ใครตอบถูก? แตะเลือกได้หลายคน':'Who got it? Tap all that apply');
     for(let i=0;i<G.players;i++){
       const b = document.createElement('button');
@@ -605,6 +642,57 @@ function openAnswerPopup(correct, wrongMsg){
     confirmBtn.style.display = 'none';
   }
   document.getElementById('answerPopup').classList.add('show');
+}
+
+// โหมดฝึกหัด: ถาม "ตอบเอง" หรือ "เพื่อนช่วย"
+function buildPracticeChoices(prompt, wrap, confirmBtn){
+  confirmBtn.style.display = 'none';
+  const t = G.turn;
+  prompt.textContent = 'P'+(t+1)+(LANG=='th'?' ตอบถูก! ตอบได้อย่างไร?':' got it! How?');
+  const selfBtn = document.createElement('button');
+  selfBtn.className = 'answer-pbtn';
+  selfBtn.style.background = PLAYER_COLORS[t];
+  selfBtn.textContent = (LANG=='th'?'ตอบเอง +1':'Solo +1');
+  selfBtn.onclick = () => awardPractice(t, null);
+  wrap.appendChild(selfBtn);
+  if(G.players > 1){
+    const helpBtn = document.createElement('button');
+    helpBtn.className = 'answer-pbtn';
+    helpBtn.style.background = 'var(--orange)';
+    helpBtn.textContent = (LANG=='th'?'🤝 เพื่อนช่วย':'🤝 Helped');
+    helpBtn.onclick = () => showHelperChoices(prompt, wrap);
+    wrap.appendChild(helpBtn);
+  }
+}
+
+// เลือกเพื่อนที่ช่วยใบ้ (แบ่งครึ่งคะแนน)
+function showHelperChoices(prompt, wrap){
+  prompt.textContent = (LANG=='th'?'ใครเป็นคนช่วยใบ้? (แบ่งคนละครึ่ง)':'Who helped? (split the point)');
+  wrap.innerHTML = '';
+  for(let i=0;i<G.players;i++){
+    if(i === G.turn) continue;
+    const b = document.createElement('button');
+    b.className = 'answer-pbtn';
+    b.style.background = PLAYER_COLORS[i];
+    b.textContent = 'P' + (i+1);
+    b.onclick = () => awardPractice(G.turn, i);
+    wrap.appendChild(b);
+  }
+}
+
+// ให้คะแนนโหมดฝึกหัด: ตอบเอง +1 / มีเพื่อนช่วย คนละ +0.5
+function awardPractice(self, helper){
+  if(helper === null){
+    G.scores[self] += 1;
+    updateScore(self); flashPlayer(self);
+  } else {
+    G.scores[self] += 0.5;
+    G.scores[helper] += 0.5;
+    updateScore(self); flashPlayer(self);
+    updateScore(helper); flashPlayer(helper);
+  }
+  document.getElementById('answerPopup').classList.remove('show');
+  setTimeout(()=>nextRound(), 250);
 }
 
 // แตะเลือก/ยกเลิกผู้เล่น (เลือกได้หลายคน)
@@ -625,13 +713,7 @@ function updateConfirmLabel(){
 function confirmAward(){
   const picked = [...document.querySelectorAll('.answer-pbtn.selected')].map(b=>parseInt(b.dataset.idx));
   if(picked.length === 0) return;
-  picked.forEach(i=>{
-    G.scores[i]++;
-    const sc = document.getElementById('score'+i);
-    if(sc) sc.textContent = G.scores[i];
-    const pl = document.getElementById('player'+i);
-    if(pl){ pl.classList.remove('flash'); void pl.offsetWidth; pl.classList.add('flash'); }
-  });
+  picked.forEach(i=>{ G.scores[i]++; updateScore(i); flashPlayer(i); });
   document.getElementById('answerPopup').classList.remove('show');
   setTimeout(()=>nextRound(), 250);
 }
@@ -666,7 +748,7 @@ function endGame(){
   for(let i=0;i<G.players;i++){
     const div = document.createElement('div');
     div.className = 'score-row' + (G.scores[i]===max && max>0?' winner':'');
-    div.innerHTML = '<div>P'+(i+1)+'</div><div style="font-size:36px;color:var(--hotpink)">'+G.scores[i]+'</div>';
+    div.innerHTML = '<div>P'+(i+1)+'</div><div style="font-size:36px;color:var(--hotpink)">'+scoreText(G.scores[i])+'</div>';
     board.appendChild(div);
   }
   const winners=[];
