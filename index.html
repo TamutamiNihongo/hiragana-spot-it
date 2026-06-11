@@ -145,8 +145,8 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none;touch-action:
 .setup-card h2{color:var(--hotpink);font-weight:900;font-size:clamp(22px,5vw,36px);margin-bottom:14px}
 .player-count{display:flex;gap:12px;justify-content:center;margin:18px 0;flex-wrap:wrap}
 .mode-toggle{display:flex;gap:10px;justify-content:center;margin:10px 0 4px;flex-wrap:wrap}
-.mode-opt,.gm-opt{background:#FFE5EE;color:var(--hotpink);font-weight:900;font-size:clamp(14px,3.3vw,17px);padding:12px 18px;border-radius:14px;cursor:pointer;border:4px solid transparent;transition:all .15s;min-height:48px;display:flex;align-items:center}
-.mode-opt.selected,.gm-opt.selected{background:var(--hotpink);color:#fff;border-color:#fff;box-shadow:0 0 0 4px var(--hotpink)}
+.mode-opt,.gm-opt,.deck-opt{background:#FFE5EE;color:var(--hotpink);font-weight:900;font-size:clamp(14px,3.3vw,17px);padding:12px 18px;border-radius:14px;cursor:pointer;border:4px solid transparent;transition:all .15s;min-height:48px;display:flex;align-items:center}
+.mode-opt.selected,.gm-opt.selected,.deck-opt.selected{background:var(--hotpink);color:#fff;border-color:#fff;box-shadow:0 0 0 4px var(--hotpink)}
 .pc-opt{background:#FFE5EE;color:var(--hotpink);font-weight:900;font-size:clamp(20px,5vw,30px);width:clamp(62px,15vw,80px);height:clamp(62px,15vw,80px);border-radius:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;border:4px solid transparent;transition:all .15s}
 .pc-opt:hover{background:#FFD0E0}
 .pc-opt.selected{background:var(--hotpink);color:#fff;border-color:#fff;box-shadow:0 0 0 4px var(--hotpink)}
@@ -197,6 +197,12 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none;touch-action:
 <div class="mode-toggle">
 <div class="gm-opt selected" data-mode="challenge" onclick="setMode('challenge')" data-th="🏆 แข่งขัน (ซามุไร)" data-en="🏆 Challenge (Samurai)">🏆 แข่งขัน (ซามุไร)</div>
 <div class="gm-opt" data-mode="practice" onclick="setMode('practice')" data-th="🐣 ฝึกหัด (เบบี้)" data-en="🐣 Practice (Baby)">🐣 ฝึกหัด (เบบี้)</div>
+</div>
+<div data-th="ชุดตัวอักษร" data-en="Character Set" style="font-weight:900;color:#666;margin-top:10px">ชุดตัวอักษร</div>
+<div class="mode-toggle">
+<div class="deck-opt selected" data-deck="basic" onclick="setDeck('basic')" data-th="พื้นฐาน 46" data-en="Basic 46">พื้นฐาน 46</div>
+<div class="deck-opt" data-deck="dakuon" onclick="setDeck('dakuon')" data-th="ขุ่น+กึ่งขุ่น 25" data-en="Dakuon 25">ขุ่น+กึ่งขุ่น 25</div>
+<div class="deck-opt" data-deck="yoon" onclick="setDeck('yoon')" data-th="เสียงควบ 33" data-en="Yōon 33">เสียงควบ 33</div>
 </div>
 <div data-th="จำนวนผู้เล่น" data-en="Number of Players" style="font-weight:900;color:#666;margin-top:10px">จำนวนผู้เล่น</div>
 <div class="player-count">
@@ -370,9 +376,82 @@ const HIRAGANA_DATA = [
   {n:46, char:'ん', romaji:'n', file:'46-n.png'}
 ];
 
+// ===== เสียงขุ่น (濁音) + กึ่งขุ่น (半濁音) 25 ตัว =====
+const DAKUON_DATA = [
+  {n:1, char:'が', romaji:'ga', file:'1-ga.png'},
+  {n:2, char:'ぎ', romaji:'gi', file:'2-gi.png'},
+  {n:3, char:'ぐ', romaji:'gu', file:'3-gu.png'},
+  {n:4, char:'げ', romaji:'ge', file:'4-ge.png'},
+  {n:5, char:'ご', romaji:'go', file:'5-go.png'},
+  {n:6, char:'ざ', romaji:'za', file:'6-za.png'},
+  {n:7, char:'じ', romaji:'ji', file:'7-ji.png'},
+  {n:8, char:'ず', romaji:'zu', file:'8-zu.png'},
+  {n:9, char:'ぜ', romaji:'ze', file:'9-ze.png'},
+  {n:10, char:'ぞ', romaji:'zo', file:'10-zo.png'},
+  {n:11, char:'だ', romaji:'da', file:'11-da.png'},
+  {n:12, char:'ぢ', romaji:'ji', file:'12-ji.png'},
+  {n:13, char:'づ', romaji:'zu', file:'13-zu.png'},
+  {n:14, char:'で', romaji:'de', file:'14-de.png'},
+  {n:15, char:'ど', romaji:'do', file:'15-do.png'},
+  {n:16, char:'ば', romaji:'ba', file:'16-ba.png'},
+  {n:17, char:'び', romaji:'bi', file:'17-bi.png'},
+  {n:18, char:'ぶ', romaji:'bu', file:'18-bu.png'},
+  {n:19, char:'べ', romaji:'be', file:'19-be.png'},
+  {n:20, char:'ぼ', romaji:'bo', file:'20-bo.png'},
+  {n:21, char:'ぱ', romaji:'pa', file:'21-pa.png'},
+  {n:22, char:'ぴ', romaji:'pi', file:'22-pi.png'},
+  {n:23, char:'ぷ', romaji:'pu', file:'23-pu.png'},
+  {n:24, char:'ぺ', romaji:'pe', file:'24-pe.png'},
+  {n:25, char:'ぽ', romaji:'po', file:'25-po.png'}
+];
+
+// ===== เสียงควบ (拗音) 33 ชุด =====
+const YOON_DATA = [
+  {n:1, char:'きゃ', romaji:'kya', file:'1-kya.png'},
+  {n:2, char:'きゅ', romaji:'kyu', file:'2-kyu.png'},
+  {n:3, char:'きょ', romaji:'kyo', file:'3-kyo.png'},
+  {n:4, char:'しゃ', romaji:'sha', file:'4-sha.png'},
+  {n:5, char:'しゅ', romaji:'shu', file:'5-shu.png'},
+  {n:6, char:'しょ', romaji:'sho', file:'6-sho.png'},
+  {n:7, char:'ちゃ', romaji:'cha', file:'7-cha.png'},
+  {n:8, char:'ちゅ', romaji:'chu', file:'8-chu.png'},
+  {n:9, char:'ちょ', romaji:'cho', file:'9-cho.png'},
+  {n:10, char:'にゃ', romaji:'nya', file:'10-nya.png'},
+  {n:11, char:'にゅ', romaji:'nyu', file:'11-nyu.png'},
+  {n:12, char:'にょ', romaji:'nyo', file:'12-nyo.png'},
+  {n:13, char:'ひゃ', romaji:'hya', file:'13-hya.png'},
+  {n:14, char:'ひゅ', romaji:'hyu', file:'14-hyu.png'},
+  {n:15, char:'ひょ', romaji:'hyo', file:'15-hyo.png'},
+  {n:16, char:'みゃ', romaji:'mya', file:'16-mya.png'},
+  {n:17, char:'みゅ', romaji:'myu', file:'17-myu.png'},
+  {n:18, char:'みょ', romaji:'myo', file:'18-myo.png'},
+  {n:19, char:'りゃ', romaji:'rya', file:'19-rya.png'},
+  {n:20, char:'りゅ', romaji:'ryu', file:'20-ryu.png'},
+  {n:21, char:'りょ', romaji:'ryo', file:'21-ryo.png'},
+  {n:22, char:'ぎゃ', romaji:'gya', file:'22-gya.png'},
+  {n:23, char:'ぎゅ', romaji:'gyu', file:'23-gyu.png'},
+  {n:24, char:'ぎょ', romaji:'gyo', file:'24-gyo.png'},
+  {n:25, char:'じゃ', romaji:'ja', file:'25-ja.png'},
+  {n:26, char:'じゅ', romaji:'ju', file:'26-ju.png'},
+  {n:27, char:'じょ', romaji:'jo', file:'27-jo.png'},
+  {n:28, char:'びゃ', romaji:'bya', file:'28-bya.png'},
+  {n:29, char:'びゅ', romaji:'byu', file:'29-byu.png'},
+  {n:30, char:'びょ', romaji:'byo', file:'30-byo.png'},
+  {n:31, char:'ぴゃ', romaji:'pya', file:'31-pya.png'},
+  {n:32, char:'ぴゅ', romaji:'pyu', file:'32-pyu.png'},
+  {n:33, char:'ぴょ', romaji:'pyo', file:'33-pyo.png'}
+];
+
+// ชุดตัวอักษรที่เลือกเล่นได้
+const DECKS = {
+  basic:  { folder:'Hiragana a-n',            items:HIRAGANA_DATA },
+  dakuon: { folder:'เสียงขุ่น เสียงกึ่งขุ่น', items:DAKUON_DATA },
+  yoon:   { folder:'เสียงควบ',                items:YOON_DATA }
+};
+
 const TOTAL_CARDS = 46;
 
-let G = {players:2, rounds:46, current:0, scores:[0,0,0,0], active:0, cardA:null, cardB:null, awarded:false, commonIdx:null, selectedChar:null, timed:false, timeLimit:15, timeLeft:15, timerId:null, answerOrder:[], mode:'challenge', turn:0};
+let G = {players:2, rounds:46, current:0, scores:[0,0,0,0], active:0, cardA:null, cardB:null, awarded:false, commonIdx:null, selectedChar:null, timed:false, timeLimit:15, timeLeft:15, timerId:null, answerOrder:[], mode:'challenge', turn:0, deck:HIRAGANA_DATA, deckFolder:'Hiragana a-n'};
 
 // แสดงคะแนน รองรับทศนิยม .5 (เช่น 3.5)
 function scoreText(v){ return Number.isInteger(v) ? String(v) : v.toFixed(1); }
@@ -399,8 +478,15 @@ function speakChar(text){
 }
 
 // Get image path
+function pathFor(folder, file){
+  return folder+'/'+encodeURIComponent(file);
+}
 function getHiraganaPath(file){
-  return 'Hiragana a-n/'+encodeURIComponent(file);
+  return pathFor('Hiragana a-n', file);
+}
+// path ของตัวอักษรในชุดที่กำลังเล่น
+function deckPath(item){
+  return pathFor(G.deckFolder, item.file);
 }
 
 // คำอ่าน: ปกติ "あ (a)" แต่ถ้า romaji มีวงเล็บอยู่แล้ว (เช่น (w)o) จะไม่ครอบวงเล็บซ้ำ
@@ -460,6 +546,15 @@ function setMode(m){
   document.querySelectorAll('.gm-opt').forEach(el=>{ el.classList.toggle('selected', el.dataset.mode===m); });
 }
 
+function setDeck(key){
+  document.querySelectorAll('.deck-opt').forEach(el=>{ el.classList.toggle('selected', el.dataset.deck===key); });
+  // ปรับจำนวนรอบสูงสุด/ค่าเริ่มต้นตามขนาดชุด
+  const n = DECKS[key].items.length;
+  const inp = document.getElementById('roundsInput');
+  inp.max = n;
+  inp.value = n;
+}
+
 // ===== TIMER (โหมดจับเวลาต่อรอบ) =====
 function startTimer(){
   stopTimer();
@@ -495,11 +590,15 @@ function shuffle(arr){
 }
 
 function startGame(){
-  G.rounds = Math.max(5, Math.min(46, parseInt(document.getElementById('roundsInput').value)||46));
+  const deckKey = document.querySelector('.deck-opt.selected')?.dataset.deck || 'basic';
+  G.deck = DECKS[deckKey].items;
+  G.deckFolder = DECKS[deckKey].folder;
+  const deckLen = G.deck.length;
+  G.rounds = Math.max(5, Math.min(deckLen, parseInt(document.getElementById('roundsInput').value)||deckLen));
   G.timed = document.querySelector('.mode-opt.selected')?.dataset.timed === '1';
   G.timeLimit = Math.max(5, Math.min(60, parseInt(document.getElementById('timeInput').value)||15));
   G.mode = document.querySelector('.gm-opt.selected')?.dataset.mode || 'challenge';
-  G.answerOrder = shuffle(Array.from({length:TOTAL_CARDS},(_,i)=>i)); // เฉลยครบ 46 ตัวแบบไม่ซ้ำ
+  G.answerOrder = shuffle(Array.from({length:deckLen},(_,i)=>i)); // เฉลยครบทุกตัวแบบไม่ซ้ำ
   G.current = 0; G.scores = [0,0,0,0]; G.active = 0; G.turn = 0;
   G.cardA = null; G.cardB = null; G.awarded = false;
   document.getElementById('totalRounds').textContent = G.rounds;
@@ -527,15 +626,16 @@ function buildPlayerPanels(){
 // สร้างการ์ด 2 ใบที่มีตัวเหมือนกัน 1 ตัว (common) ตามที่กำหนด
 function generateCardPair(common){
   // cardA = common + อีก 7 ตัวสุ่ม (ไม่ซ้ำ common)
+  const N = G.deck.length;
   const pool = [];
-  for(let i=0;i<TOTAL_CARDS;i++) if(i!==common) pool.push(i);
+  for(let i=0;i<N;i++) if(i!==common) pool.push(i);
   shuffle(pool);
   const cardA = [common];
   for(let k=0;k<7;k++) cardA.push(pool[k]);
   // cardB = common + อีก 7 ตัวที่ไม่อยู่ใน cardA (ให้เหมือนกันแค่ common ตัวเดียว)
   const used = new Set(cardA);
   const restB = [];
-  for(let i=0;i<TOTAL_CARDS;i++) if(!used.has(i)) restB.push(i);
+  for(let i=0;i<N;i++) if(!used.has(i)) restB.push(i);
   shuffle(restB);
   const cardB = [common];
   for(let k=0;k<7;k++) cardB.push(restB[k]);
@@ -583,7 +683,7 @@ function showCard(elId, charIndices){
   const el = document.getElementById(elId);
   el.innerHTML = '';
   charIndices.forEach((idx, pos) => {
-    const h = HIRAGANA_DATA[idx];
+    const h = G.deck[idx];
     const p = CARD_POSITIONS[pos];
     const rot = (Math.random()*24 - 12).toFixed(1);
     const div = document.createElement('div');
@@ -592,7 +692,7 @@ function showCard(elId, charIndices){
     div.style.left = p.x + '%';
     div.style.top = p.y + '%';
     div.style.setProperty('--rot', rot + 'deg');
-    div.innerHTML = '<img src="'+getHiraganaPath(h.file)+'" alt="'+h.char+'">';
+    div.innerHTML = '<img src="'+deckPath(h)+'" alt="'+h.char+'">';
     div.onclick = () => selectChar(idx);
     el.appendChild(div);
   });
@@ -614,8 +714,8 @@ function selectChar(idx){
 // correct = false -> กดผิด: โชว์เฉลยอย่างเดียว ไม่ให้คะแนน (มีแค่ปุ่มข้าม)
 function openAnswerPopup(correct, wrongMsg){
   stopTimer();
-  const h = HIRAGANA_DATA[G.selectedChar];
-  document.getElementById('answerImg').src = getHiraganaPath(h.file);
+  const h = G.deck[G.selectedChar];
+  document.getElementById('answerImg').src = deckPath(h);
   document.getElementById('answerReading').textContent = readingLabel(h);
   speakChar(h.char);
   const wrap = document.getElementById('answerPlayers');
@@ -736,7 +836,7 @@ function resetScores(){
   if(!confirm(LANG=='th'?'รีเซ็ตคะแนน?':'Reset scores?')) return;
   G.scores=[0,0,0,0];
   for(let i=0;i<4;i++){ const el=document.getElementById('score'+i); if(el) el.textContent='0'; }
-  G.answerOrder = shuffle(Array.from({length:TOTAL_CARDS},(_,i)=>i));
+  G.answerOrder = shuffle(Array.from({length:G.deck.length},(_,i)=>i));
   G.current=0; nextRound();
 }
 
