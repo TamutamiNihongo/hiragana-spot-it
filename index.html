@@ -203,6 +203,7 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none;touch-action:
 <div class="deck-opt selected" data-deck="basic" onclick="setDeck('basic')" data-th="พื้นฐาน 46" data-en="Basic 46">พื้นฐาน 46</div>
 <div class="deck-opt" data-deck="dakuon" onclick="setDeck('dakuon')" data-th="ขุ่น+กึ่งขุ่น 25" data-en="Dakuon 25">ขุ่น+กึ่งขุ่น 25</div>
 <div class="deck-opt" data-deck="yoon" onclick="setDeck('yoon')" data-th="เสียงควบ 33" data-en="Yōon 33">เสียงควบ 33</div>
+<div class="deck-opt" data-deck="long" onclick="setDeck('long')" data-th="เสียงยาว 81" data-en="Long 81">เสียงยาว 81</div>
 </div>
 <div data-th="จำนวนผู้เล่น" data-en="Number of Players" style="font-weight:900;color:#666;margin-top:10px">จำนวนผู้เล่น</div>
 <div class="player-count">
@@ -442,11 +443,97 @@ const YOON_DATA = [
   {n:33, char:'ぴょ', romaji:'pyo', file:'33-pyo.png'}
 ];
 
+// ===== เสียงยาว (長音) 81 ชุด =====
+const LONG_DATA = [
+  {n:1, char:'ああ', romaji:'aa', file:'1.png'},
+  {n:2, char:'かあ', romaji:'kaa', file:'2.png'},
+  {n:3, char:'さあ', romaji:'saa', file:'3.png'},
+  {n:4, char:'たあ', romaji:'taa', file:'4.png'},
+  {n:5, char:'なあ', romaji:'naa', file:'5.png'},
+  {n:6, char:'はあ', romaji:'haa', file:'6.png'},
+  {n:7, char:'まあ', romaji:'maa', file:'7.png'},
+  {n:8, char:'やあ', romaji:'yaa', file:'8.png'},
+  {n:9, char:'らあ', romaji:'raa', file:'9.png'},
+  {n:10, char:'わあ', romaji:'waa', file:'10.png'},
+  {n:11, char:'いい', romaji:'ii', file:'11.png'},
+  {n:12, char:'きい', romaji:'kii', file:'12.png'},
+  {n:13, char:'しい', romaji:'shii', file:'13.png'},
+  {n:14, char:'ちい', romaji:'chii', file:'14.png'},
+  {n:15, char:'にい', romaji:'nii', file:'15.png'},
+  {n:16, char:'ひい', romaji:'hii', file:'16.png'},
+  {n:17, char:'みい', romaji:'mii', file:'17.png'},
+  {n:18, char:'りい', romaji:'rii', file:'18.png'},
+  {n:19, char:'うう', romaji:'uu', file:'19.png'},
+  {n:20, char:'くう', romaji:'kuu', file:'20.png'},
+  {n:21, char:'すう', romaji:'suu', file:'21.png'},
+  {n:22, char:'つう', romaji:'tsuu', file:'22.png'},
+  {n:23, char:'ぬう', romaji:'nuu', file:'23.png'},
+  {n:24, char:'ふう', romaji:'fuu', file:'24.png'},
+  {n:25, char:'むう', romaji:'muu', file:'25.png'},
+  {n:26, char:'ゆう', romaji:'yuu', file:'26.png'},
+  {n:27, char:'るう', romaji:'ruu', file:'27.png'},
+  {n:28, char:'えい', romaji:'ei', file:'28.png'},
+  {n:29, char:'けい', romaji:'kei', file:'29.png'},
+  {n:30, char:'せい', romaji:'sei', file:'30.png'},
+  {n:31, char:'てい', romaji:'tei', file:'31.png'},
+  {n:32, char:'ねい', romaji:'nei', file:'32.png'},
+  {n:33, char:'へい', romaji:'hei', file:'33.png'},
+  {n:34, char:'めい', romaji:'mei', file:'34.png'},
+  {n:35, char:'れい', romaji:'rei', file:'35.png'},
+  {n:36, char:'ええ', romaji:'ee', file:'36.png'},
+  {n:37, char:'ねえ', romaji:'nee', file:'37.png'},
+  {n:38, char:'おう', romaji:'ou', file:'38.png'},
+  {n:39, char:'こう', romaji:'kou', file:'39.png'},
+  {n:40, char:'そう', romaji:'sou', file:'40.png'},
+  {n:41, char:'とう', romaji:'tou', file:'41.png'},
+  {n:42, char:'のう', romaji:'nou', file:'42.png'},
+  {n:43, char:'ほう', romaji:'hou', file:'43.png'},
+  {n:44, char:'もう', romaji:'mou', file:'44.png'},
+  {n:45, char:'よう', romaji:'you', file:'45.png'},
+  {n:46, char:'ろう', romaji:'rou', file:'46.png'},
+  {n:47, char:'おお', romaji:'oo', file:'47.png'},
+  {n:48, char:'こお', romaji:'koo', file:'48.png'},
+  {n:49, char:'きゃあ', romaji:'kyaa', file:'49.png'},
+  {n:50, char:'しゃあ', romaji:'shaa', file:'50.png'},
+  {n:51, char:'ちゃあ', romaji:'chaa', file:'51.png'},
+  {n:52, char:'にゃあ', romaji:'nyaa', file:'52.png'},
+  {n:53, char:'ひゃあ', romaji:'hyaa', file:'53.png'},
+  {n:54, char:'みゃあ', romaji:'myaa', file:'54.png'},
+  {n:55, char:'りゃあ', romaji:'ryaa', file:'55.png'},
+  {n:56, char:'ぎゃあ', romaji:'gyaa', file:'56.png'},
+  {n:57, char:'じゃあ', romaji:'jaa', file:'57.png'},
+  {n:58, char:'びゃあ', romaji:'byaa', file:'58.png'},
+  {n:59, char:'ぴゃあ', romaji:'pyaa', file:'59.png'},
+  {n:60, char:'きゅう', romaji:'kyuu', file:'60.png'},
+  {n:61, char:'しゅう', romaji:'shuu', file:'61.png'},
+  {n:62, char:'ちゅう', romaji:'chuu', file:'62.png'},
+  {n:63, char:'にゅう', romaji:'nyuu', file:'63.png'},
+  {n:64, char:'ひゅう', romaji:'hyuu', file:'64.png'},
+  {n:65, char:'みゅう', romaji:'myuu', file:'65.png'},
+  {n:66, char:'りゅう', romaji:'ryuu', file:'66.png'},
+  {n:67, char:'ぎゅう', romaji:'gyuu', file:'67.png'},
+  {n:68, char:'じゅう', romaji:'juu', file:'68.png'},
+  {n:69, char:'びゅう', romaji:'byuu', file:'69.png'},
+  {n:70, char:'ぴゅう', romaji:'pyuu', file:'70.png'},
+  {n:71, char:'きょう', romaji:'kyou', file:'71.png'},
+  {n:72, char:'しょう', romaji:'shou', file:'72.png'},
+  {n:73, char:'ちょう', romaji:'chou', file:'73.png'},
+  {n:74, char:'にょう', romaji:'nyou', file:'74.png'},
+  {n:75, char:'ひょう', romaji:'hyou', file:'75.png'},
+  {n:76, char:'みょう', romaji:'myou', file:'76.png'},
+  {n:77, char:'りょう', romaji:'ryou', file:'77.png'},
+  {n:78, char:'ぎょう', romaji:'gyou', file:'78.png'},
+  {n:79, char:'じょう', romaji:'jou', file:'79.png'},
+  {n:80, char:'びょう', romaji:'byou', file:'80.png'},
+  {n:81, char:'ぴょう', romaji:'pyou', file:'81.png'}
+];
+
 // ชุดตัวอักษรที่เลือกเล่นได้
 const DECKS = {
   basic:  { folder:'Hiragana a-n',            items:HIRAGANA_DATA },
   dakuon: { folder:'เสียงขุ่น เสียงกึ่งขุ่น', items:DAKUON_DATA },
-  yoon:   { folder:'เสียงควบ',                items:YOON_DATA }
+  yoon:   { folder:'เสียงควบ',                items:YOON_DATA },
+  long:   { folder:'เสียงยาว',                items:LONG_DATA }
 };
 
 const TOTAL_CARDS = 46;
